@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Melon Wallet | Gestão Financeira</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="nav-content">
+            <div class="nav-logo">
+                <img src="logo.png" alt="Melon Logo">
+                <span class="nav-brand-text">melon</span>
+            </div>
+            <div class="nav-links">
+                <a href="#info-section" class="nav-item">Conheça o gerenciamento:</a>
+                <div class="nav-auth-group">
+                    <button class="nav-btn-login" onclick="mostrarLogin()">Login</button>
+                    <button class="nav-btn-signup" onclick="mostrarCadastro()">Cadastrar</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="hero-auth">
+        <div class="glass-card">
+            <div class="brand-container">
+                <img src="logo.png" alt="Melon Logo" class="logo-melon"> 
+                <span class="brand-name">Melon Wallet</span>
+            </div>
+            
+            <div id="auth-login">
+                <h2>Bem-vindo de volta!</h2>
+                <form id="formLogin">
+                    <input type="email" id="emailLogin" placeholder="E-mail" required>
+                    <input type="password" id="senhaLogin" placeholder="Senha" required>
+                    <button type="submit" class="btn-main">Entrar na conta</button>
+                </form>
+                <div class="link-alternativo">
+                    Não tem conta? <a href="#" onclick="toggleAuth()">Criar agora</a>
+                </div>
+            </div>
+
+            <div id="auth-cadastro" style="display: none;">
+                <h2>Criar sua conta:</h2>
+                <form id="formCadastro">
+                    <input type="text" id="nome" placeholder="Nome completo" required>
+                    <input type="email" id="email" placeholder="E-mail" required>
+                    <input type="password" id="senha" placeholder="Senha" required>
+                    <button type="submit" class="btn-main">Cadastrar</button>
+                </form>
+                <div class="link-alternativo">
+                    Já possui conta? <a href="#" onclick="toggleAuth()">Fazer login</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <section id="info-section" class="info-section">
+        <div class="info-content">
+            <div class="early-access-badge reveal">CONHEÇA SEU GESTOR FINANCEIRO</div>
+            <h1 class="main-title reveal">Simule e organize-se.<br>Monitore e se planeje.</h1>
+            <p class="description-text reveal">Conheça o projeto que irá te ajudar a evoluir na gestão financeira.<br>Perfile, explore e edite suas simulações financeiras.</p>
+            
+            <div class="mockup-container reveal" id="mockup-view">
+                <div class="mockup-header">
+                    <div class="dots">
+                        <span class="dot-red"></span>
+                        <span class="dot-yellow"></span>
+                        <span class="dot-green"></span>
+                    </div>
+                    <div class="filename">simulacao_financas_2026.csv — Melon</div>
+                </div>
+
+                <div class="mockup-tabs">
+                    <div class="tab active">Table</div>
+                    <div class="tab">Profile</div>
+                    <div class="tab">Charts</div>
+                    <div class="tab">Transform</div>
+                </div>
+
+                <div class="mockup-body">
+                    <div class="main-chart-container">
+                        <svg viewBox="0 0 500 120" preserveAspectRatio="none" class="main-svg">
+                            <defs>
+                                <linearGradient id="gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" style="stop-color:rgba(253, 253, 150, 0.3); stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:rgba(253, 253, 150, 0); stop-opacity:0" />
+                                </linearGradient>
+                            </defs>
+                            <path d="M0,100 C50,40 150,110 250,60 S400,20 500,50 L500,120 L0,120 Z" fill="url(#gradient)" />
+                            <path d="M0,100 C50,40 150,110 250,60 S400,20 500,50" stroke="#fdfd96" stroke-width="2" fill="none" class="chart-line" />
+                        </svg>
+                    </div>
+
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>DATA</th>
+                                    <th>RECURSO</th>
+                                    <th>CATEGORIA</th>
+                                    <th>VALOR</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td>2026-04-17</td><td class="text-neon">SALÁRIO</td><td>LATAM</td><td>R$ 8.429,14</td></tr>
+                                <tr class="row-selected"><td>2026-04-18</td><td>ALUGUEL</td><td>FIXO</td><td class="text-red">R$ 2.108,55</td></tr>
+                                <tr><td>2026-04-19</td><td class="text-neon">INVESTIMENTOS</td><td>VARIAVEL</td><td>R$ 1.091,00</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="mockup-footer">
+                    <div class="stat"><span>SALDO: <BR></BR></span><strong>R$ 3.841,33</strong></div>
+                    <div class="footer-info">melon 1.0 </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="features-section">
+        <div class="features-grid">
+            <div class="feature-card reveal">
+                <div class="icon-box">🔐</div>
+                <h3>Segurança de Ponta</h3>
+                <p>Proteção de dados com criptografia via Supabase, garantindo que suas simulações estejam sempre seguras sob sua autenticação.</p>
+            </div>
+
+            <div class="feature-card reveal">
+                <div class="icon-box">🛡️</div>
+                <h3>Privacidade Total</h3>
+                <p>Seus dados financeiros não são rastreados. O Melon Wallet foca na sua autonomia e no sigilo absoluto das suas informações.</p>
+            </div>
+
+            <div class="feature-card reveal">
+                <div class="icon-box">🐜</div>
+                <h3>Gerente de Investimento</h3>
+                <p>Um simulador voltado para o seu investimento. Que organiza e contribui para o seu objetivo. O seu sonho é possivel com um ótimo controle de investimenta.</p>
+            </div>
+        </div>
+
+        <div class="final-cta reveal">
+            <h2>Pronto para transformar sua gestão?</h2>
+            <button class="btn-main" onclick="mostrarCadastro()" style="max-width: 320px; margin: 0 auto;">Começar agora gratuitamente</button>
+        </div>
+    </section>
+
+    <footer class="footer-minimal">
+        <div class="footer-content">
+            <div class="footer-left">
+                <img src="logo.png" alt="Melon Logo">
+                <span>Melon Wallet @2026.</span>
+            </div>
+            <div class="footer-right">
+                <a href="#mockup-view">Gráfico</a>
+                <a href="https://github.com/ViniciusSantosbit/melonwallet" target="_blank" rel="noopener noreferrer">Github</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="conexao/conexao.js"></script>
+    <script src="conexao/auth.js"></script> 
+</body>
+</html>

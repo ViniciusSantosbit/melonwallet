@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Melon Wallet | Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    
+    <style>
+        .chart-box { position: relative; width: 100%; height: 300px; }
+        
+        /* Barra de Meta das Formiguinhas */
+        .goal-section { margin-top: 30px; padding: 25px; background: rgba(255, 255, 255, 0.02); border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.05); }
+        .ant-track {
+            width: 100%; height: 14px; background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px; position: relative; margin: 45px 0 25px 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .ant-progress {
+            height: 100%; background: linear-gradient(90deg, #f1f09d, #32D74B);
+            border-radius: 20px; width: 0%; transition: width 1.5s ease-in-out;
+            position: relative;
+        }
+        .ant-walker { position: absolute; right: -12px; top: -28px; font-size: 24px; transition: 0.5s; }
+        .melon-target { position: absolute; right: -5px; top: -38px; font-size: 35px; }
+        
+        /* Insights de Gastos */
+        .top-expenses-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-top: 20px; }
+        .expense-insight-card { background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); padding: 15px; border-radius: 15px; transition: 0.3s; }
+        .expense-insight-card span { color: #86868b; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; }
+        .expense-insight-card b { display: block; color: #fff; font-size: 1.2rem; margin-top: 5px; }
+        
+        .btn-edit-goal { background: none; border: none; color: #86868b; cursor: pointer; font-size: 0.75rem; text-decoration: underline; }
+        
+        /* Estilo do Seletor de Saldo */
+        .saldo-selector { background: none; border: none; color: #86868b; font-size: 0.75rem; cursor: pointer; outline: none; }
+        .saldo-selector option { background: #1c1c1e; color: #fff; }
+    </style>
+</head>
+<body class="dashboard-body">
+
+    <nav class="navbar">
+        <div class="nav-content">
+            <div class="nav-logo">
+                <img src="logo.png" alt="Melon Logo">
+                <span class="nav-brand-text">melon</span>
+            </div>
+            <div class="nav-user-info">
+                <span id="user-greeting">Olá...</span>
+                <button class="nav-btn-logout" onclick="logout()">Sair</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="dashboard-container">
+        <header class="dash-header">
+            <div>
+                <h1>Visão Geral</h1>
+                <p>Gerencie seu patrimônio com a inteligência do Melão.</p>
+            </div>
+            <button class="btn-add-simulacao" onclick="abrirModal()">+ Nova Simulação</button>
+        </header>
+
+        <div class="metrics-grid">
+            <div class="metric-card gold-border">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <span>Saldo</span>
+                    <select id="seletor-tipo-saldo" onchange="alternarVisualizacaoSaldo()" class="saldo-selector">
+                        <option value="total">Total Acumulado</option>
+                        <option value="mes">Apenas este Mês</option>
+                    </select>
+                </div>
+                <h2 id="total-saldo">R$ 0,00</h2>
+                <div id="tendencia-container" class="mini-trend">...</div>
+            </div>
+            <div class="metric-card">
+                <span>Rendimento Previsto</span>
+                <h2 id="total-lucro">R$ 0,00</h2>
+                <div class="mini-trend">Lucro de 1% a.m.</div>
+            </div>
+            <div class="metric-card">
+                <span>Lançamentos</span>
+                <h2 id="total-ativos">0</h2>
+                <div class="mini-trend">Total de registros</div>
+            </div>
+        </div>
+
+        <div class="main-dash-content">
+            <div class="chart-section glass-card-dash">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                    <h3 style="margin: 0;">Histórico e Categorias</h3>
+                    <div style="background: rgba(255,255,255,0.05); padding: 5px 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
+                        <label style="color: #86868b; font-size: 0.8rem;">Gráfico do mês:</label>
+                        <select id="filtro-mes-pizza" style="background: none; border: none; color: #f1f09d; font-weight: bold; cursor: pointer; outline: none;"></select>
+                    </div>
+                </div>
+                <div class="charts-container-split" style="display: grid; grid-template-columns: 1.6fr 1fr; gap: 20px;">
+                    <div class="chart-box"><canvas id="patrimonioChart"></canvas></div>
+                    <div class="chart-box"><canvas id="pizzaChart"></canvas></div>
+                </div>
+            </div>
+            
+            <div class="list-section glass-card-dash">
+                <h3>Últimas Movimentações</h3>
+                <div class="table-scroll">
+                    <table id="simulacoes-table">
+                        <thead>
+                            <tr><th>DESCRIÇÃO</th><th>TIPO</th><th>VALOR</th><th>AÇÕES</th></tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <section class="goal-section">
+            <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+                <div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <h3 style="margin: 0;">Objetivo de Investimento</h3>
+                        <button onclick="editarMeta()" class="btn-edit-goal">alterar meta ⚙️</button>
+                    </div>
+                    <p style="color: #86868b; font-size: 0.9rem;">As formigas estão trabalhando para você!</p>
+                </div>
+                <div style="text-align: right;">
+                    <span id="goal-percent-text" style="color: #f1f09d; font-weight: bold; font-size: 1.5rem;">0%</span>
+                    <p id="goal-value-text" style="color: #86868b; font-size: 0.85rem;">R$ 0 / R$ 10.000</p>
+                </div>
+            </div>
+
+            <div class="ant-track">
+                <div id="goal-progress-bar" class="ant-progress">
+                    <span class="ant-walker">🐜</span>
+                </div>
+                <span class="melon-target">🍈</span>
+            </div>
+
+            <div style="margin-top: 50px;">
+                <h3 style="margin-bottom: 20px;">Curiosidades: Maiores Gastos do Mês</h3>
+                <div id="top-expenses-container" class="top-expenses-grid"></div>
+            </div>
+        </section>
+    </main>
+
+    <div id="modal-simulacao" class="modal-overlay" style="display: none;">
+        <div class="glass-card modal-card">
+            <header class="modal-header">
+                <h2>Novo Lançamento</h2>
+                <button class="close-btn" onclick="fecharModal()">×</button>
+            </header>
+            <form id="formSimulacao">
+                <input type="text" id="sim-nome" list="sugestoes-nomes" placeholder="Ex: Aluguel, Salário..." required>
+                <datalist id="sugestoes-nomes">
+                    <option value="Salário"><option value="Mercado"><option value="Lazer"><option value="Aluguel"><option value="Investimento">
+                </datalist>
+                <select id="sim-tipo" required>
+                    <option value="Entrada">Entrada (Ganho)</option>
+                    <option value="Saída">Saída (Gasto)</option>
+                    <option value="Investimento">Investimento</option>
+                </select>
+                <input type="month" id="sim-mes" required>
+                <input type="number" step="0.01" id="sim-valor" placeholder="Valor (R$)" required>
+                <button type="submit" class="btn-main">Salvar Registro</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="conexao/conexao.js"></script>
+    <script src="conexao/dashboard.js"></script>
+</body>
+</html>
