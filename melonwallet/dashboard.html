@@ -3,44 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Melon Wallet | Dashboard</title>
+    <title>Melon Wallet | Gráfico Geral</title>
     <link rel="stylesheet" href="style.css">
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
-    
-    <style>
-        .chart-box { position: relative; width: 100%; height: 300px; }
-        
-        /* Barra de Meta das Formiguinhas */
-        .goal-section { margin-top: 30px; padding: 25px; background: rgba(255, 255, 255, 0.02); border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.05); }
-        .ant-track {
-            width: 100%; height: 14px; background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px; position: relative; margin: 45px 0 25px 0;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .ant-progress {
-            height: 100%; background: linear-gradient(90deg, #f1f09d, #32D74B);
-            border-radius: 20px; width: 0%; transition: width 1.5s ease-in-out;
-            position: relative;
-        }
-        .ant-walker { position: absolute; right: -12px; top: -28px; font-size: 24px; transition: 0.5s; }
-        .melon-target { position: absolute; right: -5px; top: -38px; font-size: 35px; }
-        
-        /* Insights de Gastos */
-        .top-expenses-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-top: 20px; }
-        .expense-insight-card { background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08); padding: 15px; border-radius: 15px; transition: 0.3s; }
-        .expense-insight-card span { color: #86868b; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; }
-        .expense-insight-card b { display: block; color: #fff; font-size: 1.2rem; margin-top: 5px; }
-        
-        .btn-edit-goal { background: none; border: none; color: #86868b; cursor: pointer; font-size: 0.75rem; text-decoration: underline; }
-        
-        /* Estilo do Seletor de Saldo */
-        .saldo-selector { background: none; border: none; color: #86868b; font-size: 0.75rem; cursor: pointer; outline: none; }
-        .saldo-selector option { background: #1c1c1e; color: #fff; }
-    </style>
 </head>
 <body class="dashboard-body">
+
+    <div id="loader-wrapper">
+        <div class="loader-content">
+            <div class="orbit-container">
+                <span class="loader-melon">🍈</span>
+                <span class="loader-ant">🐜</span>
+                <span class="loader-ant second">🐜</span>
+            </div>
+            <p>Preparando seu patrimônio...</p>
+        </div>
+    </div>
 
     <nav class="navbar">
         <div class="nav-content">
@@ -58,7 +38,8 @@
     <main class="dashboard-container">
         <header class="dash-header">
             <div>
-                <h1>Visão Geral</h1>
+                <span id="current-date" style="color: #86868b; font-size: 0.85rem; text-transform: capitalize; font-weight: 500;"></span>
+                <h1>Visão Geral:</h1>
                 <p>Gerencie seu patrimônio com a inteligência do Melão.</p>
             </div>
             <button class="btn-add-simulacao" onclick="abrirModal()">+ Nova Simulação</button>
@@ -67,7 +48,7 @@
         <div class="metrics-grid">
             <div class="metric-card gold-border">
                 <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                    <span>Saldo</span>
+                    <span>Saldo:</span>
                     <select id="seletor-tipo-saldo" onchange="alternarVisualizacaoSaldo()" class="saldo-selector">
                         <option value="total">Total Acumulado</option>
                         <option value="mes">Apenas este Mês</option>
@@ -77,12 +58,12 @@
                 <div id="tendencia-container" class="mini-trend">...</div>
             </div>
             <div class="metric-card">
-                <span>Rendimento Previsto</span>
+                <span>Rendimento Previsto:</span>
                 <h2 id="total-lucro">R$ 0,00</h2>
                 <div class="mini-trend">Lucro de 1% a.m.</div>
             </div>
             <div class="metric-card">
-                <span>Lançamentos</span>
+                <span>Lançamentos:</span>
                 <h2 id="total-ativos">0</h2>
                 <div class="mini-trend">Total de registros</div>
             </div>

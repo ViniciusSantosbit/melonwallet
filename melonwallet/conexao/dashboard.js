@@ -1,4 +1,6 @@
 // conexao/dashboard.js
+
+// 1. Registro do Plugin de Porcentagens
 Chart.register(ChartDataLabels);
 
 let meuGraficoBarras = null;
@@ -16,12 +18,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     const userId = localStorage.getItem('melon_user_id');
     if (!userId) { window.location.href = 'index.html'; return; }
 
+    // --- BOAS VINDAS ---
     const greeting = document.getElementById('user-greeting');
     if (greeting) greeting.innerText = `Olá, ${localStorage.getItem('melon_user_nome')}`;
+
+    // --- DATA REAL ---
+    const dateElement = document.getElementById('current-date');
+    if (dateElement) {
+        const hoje = new Date();
+        const opcoes = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        dateElement.innerText = hoje.toLocaleDateString('pt-BR', opcoes);
+    }
 
     const inputMes = document.getElementById('sim-mes');
     if(inputMes) inputMes.value = new Date().toISOString().substring(0, 7);
 
+    // --- SELETOR DE MÊS DOS GRÁFICOS ---
     const seletor = document.getElementById('filtro-mes-pizza');
     if(seletor) {
         seletor.addEventListener('change', (e) => {
@@ -30,12 +42,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+    // --- CARREGAMENTO INICIAL ---
     await carregarDados();
+    
+    // Esconde a Splash Screen após carregar tudo
+    setTimeout(() => {
+        const loader = document.getElementById('loader-wrapper');
+        if (loader) loader.classList.add('fade-out');
+    }, 1500);
 });
 
-// --- CONTROLE DE INTERFACE ---
+// --- CONTROLE DE INTERFACE (MODAL E SALDO) ---
 function abrirModal() { document.getElementById('modal-simulacao').style.display = 'flex'; }
 function fecharModal() { document.getElementById('modal-simulacao').style.display = 'none'; }
+
 function alternarVisualizacaoSaldo() {
     const tipo = document.getElementById('seletor-tipo-saldo').value;
     const campoSaldo = document.getElementById('total-saldo');
@@ -52,6 +72,7 @@ function alternarVisualizacaoSaldo() {
     }
 }
 
+// --- SALVAR NO SUPABASE ---
 const formSim = document.getElementById('formSimulacao');
 if (formSim) {
     formSim.addEventListener('submit', async (e) => {
@@ -64,12 +85,12 @@ if (formSim) {
             mes_referencia: document.getElementById('sim-mes').value + "-01"
         };
         const { error } = await _supabase.from('simulacoes').insert([novaSim]);
-        if (error) alert("Erro: " + error.message);
+        if (error) alert("Erro ao salvar: " + error.message);
         else { fecharModal(); formSim.reset(); await carregarDados(); }
     });
 }
 
-// --- CARREGAR DADOS ---
+// --- BUSCAR DADOS ---
 async function carregarDados() {
     const userId = localStorage.getItem('melon_user_id');
     const { data: sims, error } = await _supabase.from('simulacoes').select('*').eq('user_id', userId).order('mes_referencia', { ascending: true });
@@ -105,7 +126,7 @@ async function carregarDados() {
         corTendenciaCalculada = perc >= 0 ? '#32D74B' : '#FF453A';
     }
 
-    alternarVisualizacaoSaldo(); // Exibe o saldo inicial
+    alternarVisualizacaoSaldo();
     document.getElementById('total-lucro').innerText = `R$ ${(saldoTotal * 0.01).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
     document.getElementById('total-ativos').innerText = sims.length;
 
@@ -128,7 +149,7 @@ async function carregarDados() {
     preencherTabela(sims);
 }
 
-// --- METAS E INSIGHTS ---
+// --- METAS E CURIOSIDADES ---
 function atualizarInsightsEMetas(mesSel) {
     const gastos = {};
     let investTotal = 0;
@@ -154,6 +175,16 @@ function atualizarInsightsEMetas(mesSel) {
     });
 }
 
+function editarMeta() {
+    const n = prompt("Nova meta de investimento (R$):", META_VALOR);
+    if (n && !isNaN(n)) {
+        META_VALOR = parseFloat(n);
+        localStorage.setItem('melon_meta_investimento', META_VALOR);
+        atualizarInsightsEMetas(document.getElementById('filtro-mes-pizza').value);
+    }
+}
+
+// --- GRÁFICOS (PIZZA E BARRAS) ---
 function atualizarPizzaPorMes(mes) {
     const cat = {};
     todasSimulacoes.forEach(s => {
@@ -165,13 +196,12 @@ function atualizarPizzaPorMes(mes) {
     renderizarGraficoPizza(Object.keys(cat), Object.values(cat));
 }
 
-// --- GRÁFICOS ---
 function renderizarGraficoPizza(labels, valores) {
     const ctx = document.getElementById('pizzaChart').getContext('2d');
     if (meuGraficoPizza) meuGraficoPizza.destroy();
     meuGraficoPizza = new Chart(ctx, {
         type: 'doughnut',
-        data: { labels, datasets: [{ data: valores, backgroundColor: ['#f1f09d', '#c26f03', '#32D74B', '#9370DB', '#FF453A'], borderWidth: 0 }] },
+        data: { labels, datasets: [{ data: valores, backgroundColor: ['#efeb03', '#c26f03', '#32D74B', '#9370DB', '#ee170c', '#f099b3' ,'#0000ff', '#ccc3c3', '#20b2aa'], borderWidth: 0 }] },
         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { color: '#888b86', usePointStyle: true } }, datalabels: { display: false } } }
     });
 }
@@ -191,21 +221,14 @@ function renderizarGraficoBarras(labels, sims) {
     });
 }
 
-function editarMeta() {
-    const n = prompt("Nova meta de investimento (R$):", META_VALOR);
-    if (n && !isNaN(n)) {
-        META_VALOR = parseFloat(n);
-        localStorage.setItem('melon_meta_investimento', META_VALOR);
-        atualizarInsightsEMetas(document.getElementById('filtro-mes-pizza').value);
-    }
-}
-
+// --- UTILITÁRIOS ---
 function preencherTabela(sims) {
     const tb = document.querySelector('#simulacoes-table tbody');
+    if (!tb) return;
     tb.innerHTML = "";
     [...sims].reverse().slice(0, 8).forEach(s => {
         const tr = document.createElement('tr');
-        tr.innerHTML = `<td>${s.nome}</td><td>${s.tipo}</td><td style="color: ${s.tipo === 'Saída' ? '#FF453A' : '#32D74B'}">R$ ${parseFloat(s.valor).toLocaleString('pt-BR')}</td><td><button onclick="deletarSimulacao('${s.id}')">🗑️</button></td>`;
+        tr.innerHTML = `<td>${s.nome}</td><td>${s.tipo}</td><td style="color: ${s.tipo === 'Saída' ? '#FF453A' : '#32D74B'}">R$ ${parseFloat(s.valor).toLocaleString('pt-BR')}</td><td><button onclick="deletarSimulacao('${s.id}')" class="btn-delete">🗑️</button></td>`;
         tb.appendChild(tr);
     });
 }
