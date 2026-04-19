@@ -6,7 +6,14 @@ Chart.register(ChartDataLabels);
 let meuGraficoBarras = null;
 let meuGraficoPizza = null;
 let todasSimulacoes = []; 
-let META_VALOR = parseFloat(localStorage.getItem('melon_meta_investimento')) || 10000;
+
+// FUNÇÃO PARA GARANTIR PERSISTÊNCIA: Pega a meta ou define 10000 como padrão
+function obterMetaSalva() {
+    const salva = localStorage.getItem('melon_meta_investimento');
+    return (salva && salva !== "undefined") ? parseFloat(salva) : 10000;
+}
+
+let META_VALOR = obterMetaSalva();
 
 // Variáveis para alternância de saldo
 let saldoGlobalCalculado = 0;
@@ -151,6 +158,9 @@ async function carregarDados() {
 
 // --- METAS E CURIOSIDADES ---
 function atualizarInsightsEMetas(mesSel) {
+    // Garante que a meta seja lida do banco local antes do cálculo
+    META_VALOR = obterMetaSalva();
+
     const gastos = {};
     let investTotal = 0;
 
@@ -180,7 +190,8 @@ function editarMeta() {
     if (n && !isNaN(n)) {
         META_VALOR = parseFloat(n);
         localStorage.setItem('melon_meta_investimento', META_VALOR);
-        atualizarInsightsEMetas(document.getElementById('filtro-mes-pizza').value);
+        const seletor = document.getElementById('filtro-mes-pizza');
+        atualizarInsightsEMetas(seletor.value || "");
     }
 }
 
@@ -234,4 +245,10 @@ function preencherTabela(sims) {
 }
 
 async function deletarSimulacao(id) { if (confirm("Excluir registro?")) { await _supabase.from('simulacoes').delete().eq('id', id); await carregarDados(); } }
-function logout() { localStorage.clear(); window.location.href = 'index.html'; }
+
+function logout() {
+    // CORREÇÃO FINAL: Limpa apenas a sessão, preservando a Meta
+    localStorage.removeItem('melon_user_id');
+    localStorage.removeItem('melon_user_nome');
+    window.location.href = 'index.html';
+}
