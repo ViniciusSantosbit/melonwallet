@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Melon Wallet | Sem conexão</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #000;
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
+            text-align: center;
+            padding: 40px 20px;
+        }
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(ellipse at 50% 0%, rgba(241,240,147,0.08) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .icon { font-size: 80px; margin-bottom: 30px; animation: float 3s ease-in-out infinite; }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-12px); }
+        }
+        h1 { font-size: 2rem; font-weight: 800; letter-spacing: -1px; margin-bottom: 12px; }
+        p { color: #86868b; font-size: 1rem; line-height: 1.6; max-width: 320px; margin-bottom: 40px; }
+        .btn {
+            background: #f1f193;
+            color: #000;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 14px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+        }
+        .btn:hover { background: #ffdb1a; transform: translateY(-2px); }
+        .status {
+            margin-top: 30px;
+            font-size: 0.8rem;
+            color: #484f58;
+        }
+        .ant-row {
+            display: flex;
+            gap: 20px;
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            opacity: 0.4;
+        }
+        .ant { animation: march 1.5s linear infinite; }
+        .ant:nth-child(2) { animation-delay: 0.3s; }
+        .ant:nth-child(3) { animation-delay: 0.6s; }
+        @keyframes march {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="ant-row">
+        <span class="ant">🐜</span>
+        <span class="ant">🐜</span>
+        <span class="ant">🐜</span>
+    </div>
+    <div class="icon">🍈</div>
+    <h1>Sem conexão</h1>
+    <p>As formigas estão tentando alcançar o servidor, mas parece que você está offline. Verifique sua conexão e tente novamente.</p>
+    <button class="btn" onclick="window.location.reload()">Tentar novamente</button>
+    <p class="status" id="status-msg">Verificando conexão...</p>
+
+    <script>
+        // Detecta quando voltar online e recarrega
+        window.addEventListener('online', () => {
+            document.getElementById('status-msg').innerText = '✅ Conexão restaurada! Redirecionando...';
+            setTimeout(() => window.location.href = '/index.html', 1500);
+        });
+
+        window.addEventListener('offline', () => {
+            document.getElementById('status-msg').innerText = '❌ Sem internet detectada.';
+        });
+
+        document.getElementById('status-msg').innerText = navigator.onLine 
+            ? '✅ Você está online. Tente recarregar.' 
+            : '❌ Sem internet detectada.';
+    </script>
+</body>
+</html>

@@ -6,6 +6,18 @@
     <title>Melon Wallet | Gestão Financeira</title>
     <link rel="icon" type="image/png" href="logo.png">
     <link rel="stylesheet" href="style.css">
+
+    <!-- ═══ PWA ═══ -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Melon Wallet">
+    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="apple-touch-icon" href="/icons/icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192x192.png">
+    <!-- ═══════════ -->
 </head>
 <body>
 
@@ -163,8 +175,121 @@
         </div>
     </footer>
 
+    <!-- ═══ PWA: Banner de Instalação ═══ -->
+    <div id="pwa-install-banner" style="display:none;">
+        <div class="pwa-banner-content">
+            <span class="pwa-banner-icon">🍈</span>
+            <div class="pwa-banner-text">
+                <strong>Instalar Melon Wallet</strong>
+                <span>Acesso rápido, funciona offline</span>
+            </div>
+            <button id="pwa-btn-install" class="pwa-btn-confirm">Instalar</button>
+            <button id="pwa-btn-close" class="pwa-btn-dismiss" aria-label="Fechar">✕</button>
+        </div>
+    </div>
+
+    <!-- ═══ PWA: Modal de instrução iOS ═══ -->
+    <div id="ios-install-modal" style="display:none;">
+        <div class="ios-modal-overlay" onclick="fecharModalIOS()"></div>
+        <div class="ios-modal-card">
+            <button class="close-btn" onclick="fecharModalIOS()">×</button>
+            <div class="ios-modal-icon">🍈</div>
+            <h3>Instalar no iPhone / iPad</h3>
+            <p>Siga os passos abaixo para adicionar o Melon Wallet à sua tela de início:</p>
+            <ol class="ios-steps">
+                <li>
+                    <span class="step-icon">⬆️</span>
+                    <span>Toque no botão <strong>Compartilhar</strong> no Safari (ícone de caixa com seta)</span>
+                </li>
+                <li>
+                    <span class="step-icon">➕</span>
+                    <span>Role a lista e selecione <strong>"Adicionar à Tela de Início"</strong></span>
+                </li>
+                <li>
+                    <span class="step-icon">✅</span>
+                    <span>Toque em <strong>Adicionar</strong> no canto superior direito</span>
+                </li>
+            </ol>
+            <div class="ios-hint">O app abrirá em tela cheia, sem barra do navegador 🎉</div>
+        </div>
+    </div>
+    <!-- ════════════════════════════════ -->
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="conexao/conexao.js"></script>
-    <script src="conexao/auth.js"></script> 
+    <script src="conexao/auth.js"></script>
+
+    <!-- ═══ PWA: Service Worker + Lógica de Instalação ═══ -->
+    <script>
+        // ── Registro do Service Worker ──────────────────────────────────────
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => console.log('[PWA] Service Worker registrado:', reg.scope))
+                    .catch(err => console.error('[PWA] Erro no SW:', err));
+            });
+        }
+
+        // ── Detecções ───────────────────────────────────────────────────────
+        const isIOS        = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+                          || window.navigator.standalone === true;
+
+        let deferredPrompt = null;
+
+        const banner      = document.getElementById('pwa-install-banner');
+        const btnInstall  = document.getElementById('pwa-btn-install');
+        const btnClose    = document.getElementById('pwa-btn-close');
+
+        // ── Android / Chrome: captura o prompt nativo ───────────────────────
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            if (!isStandalone && !sessionStorage.getItem('pwa-banner-dismissed')) {
+                setTimeout(() => { banner.style.display = 'block'; }, 3000);
+            }
+        });
+
+        btnInstall.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log('[PWA] Escolha:', outcome);
+                deferredPrompt = null;
+                banner.style.display = 'none';
+            }
+        });
+
+        btnClose.addEventListener('click', () => {
+            banner.style.display = 'none';
+            sessionStorage.setItem('pwa-banner-dismissed', '1');
+        });
+
+        window.addEventListener('appinstalled', () => {
+            banner.style.display = 'none';
+            deferredPrompt = null;
+        });
+
+        // ── iOS: instrução manual ────────────────────────────────────────────
+        if (isIOS && !isStandalone && !sessionStorage.getItem('pwa-banner-dismissed')) {
+            setTimeout(() => {
+                banner.style.display = 'block';
+                btnInstall.textContent = 'Como instalar';
+                btnInstall.addEventListener('click', abrirModalIOS, { once: true });
+            }, 3000);
+        }
+
+        function abrirModalIOS() {
+            banner.style.display = 'none';
+            document.getElementById('ios-install-modal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function fecharModalIOS() {
+            document.getElementById('ios-install-modal').style.display = 'none';
+            document.body.style.overflow = '';
+        }
+    </script>
+    <!-- ══════════════════════════════════════════════════ -->
 </body>
 </html>
