@@ -1605,3 +1605,259 @@ html, body {
         padding: 18px 14px;
     }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   DASHBOARD MOBILE FIX COMPLETO
+   Raiz do problema: charts-container-split e goal-header-row
+   tinham layout inline que sobrescrevia o CSS responsivo
+═══════════════════════════════════════════════════════════════ */
+
+/* --- charts-container-split: desktop side-by-side, mobile stacked --- */
+.charts-container-split {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr;
+    gap: 20px;
+}
+
+/* --- Header do card de gráficos --- */
+.chart-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.chart-card-header h3 {
+    margin: 0;
+    flex-shrink: 0;
+}
+
+.mes-selector-box {
+    background: rgba(255,255,255,0.05);
+    padding: 5px 15px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.mes-selector-box label {
+    color: #86868b;
+    font-size: 0.8rem;
+    white-space: nowrap;
+}
+
+.mes-selector-box select {
+    background: none;
+    border: none;
+    color: #f1f09d;
+    font-weight: bold;
+    cursor: pointer;
+    outline: none;
+    font-size: 0.85rem;
+}
+
+/* --- Goal header row --- */
+.goal-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.goal-percent-box {
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.goal-percent-box span {
+    color: #f1f09d;
+    font-weight: bold;
+    font-size: 1.5rem;
+    display: block;
+}
+
+.goal-percent-box p {
+    color: #86868b;
+    font-size: 0.85rem;
+    margin: 0;
+}
+
+/* --- MOBILE: tudo empilhado abaixo de 768px --- */
+@media (max-width: 768px) {
+
+    /* Gráficos: um embaixo do outro */
+    .charts-container-split {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+
+    /* Altura menor para caber na tela */
+    .chart-box {
+        height: 220px;
+    }
+
+    /* Header do card de gráficos empilha */
+    .chart-card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .mes-selector-box {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    /* main-dash-content: já estava em 1fr mas reforça */
+    .main-dash-content {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    /* Goal header empilha */
+    .goal-header-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .goal-percent-box {
+        text-align: left;
+    }
+
+    /* Padding menor nos cards */
+    .glass-card-dash {
+        padding: 18px 16px;
+    }
+
+    /* Dashboard container: menos padding lateral */
+    .dashboard-container {
+        padding: 24px 12px;
+    }
+
+    /* Header do dashboard empilha */
+    .dash-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    .dash-header h1 {
+        font-size: 1.7rem;
+    }
+
+    /* Botão nova simulação ocupa linha inteira */
+    .btn-add-simulacao {
+        width: 100%;
+        text-align: center;
+        padding: 13px;
+    }
+
+    /* Métricas: 1 por linha */
+    .metrics-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+
+    .metric-card {
+        padding: 20px 18px;
+    }
+
+    .metric-card h2 {
+        font-size: 1.6rem;
+    }
+
+    /* Tabela: scroll horizontal */
+    .table-scroll {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    table {
+        min-width: 420px;
+    }
+
+    /* Goal section */
+    .goal-section {
+        padding: 20px 16px;
+        margin-top: 16px;
+    }
+
+    .ant-track {
+        margin: 40px 0 20px 0;
+    }
+
+    .melon-target {
+        font-size: 26px;
+    }
+
+    /* Top expenses: 1 por linha */
+    .top-expenses-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    /* Modal */
+    .modal-card {
+        width: calc(100vw - 32px);
+        padding: 28px 20px;
+        border-radius: 20px;
+    }
+
+    /* Navbar */
+    .nav-content {
+        padding: 0 14px;
+    }
+
+    .nav-brand-text {
+        display: none;
+    }
+
+    .nav-logo img {
+        width: 52px;
+    }
+
+    #user-greeting {
+        font-size: 0.8rem;
+        max-width: 140px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+}
+
+/* --- MOBILE PEQUENO: abaixo de 390px (iPhone SE, etc) --- */
+@media (max-width: 390px) {
+
+    .chart-box {
+        height: 190px;
+    }
+
+    .dash-header h1 {
+        font-size: 1.5rem;
+    }
+
+    .metric-card h2 {
+        font-size: 1.4rem;
+    }
+
+    .goal-section h3 {
+        font-size: 0.95rem;
+    }
+
+    .expense-insight-card b {
+        font-size: 1.1rem;
+    }
+
+    .nav-btn-logout {
+        padding: 5px 8px;
+        font-size: 0.75rem;
+    }
+}

@@ -84,14 +84,16 @@
 
         <div class="main-dash-content">
             <div class="chart-section glass-card-dash">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
-                    <h3 style="margin: 0;">Histórico e Categorias</h3>
-                    <div style="background: rgba(255,255,255,0.05); padding: 5px 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
-                        <label style="color: #86868b; font-size: 0.8rem;">Gráfico do mês:</label>
-                        <select id="filtro-mes-pizza" style="background: none; border: none; color: #f1f09d; font-weight: bold; cursor: pointer; outline: none;"></select>
+                <!-- Header do card: empilha em mobile -->
+                <div class="chart-card-header">
+                    <h3>Histórico e Categorias</h3>
+                    <div class="mes-selector-box">
+                        <label>Gráfico do mês:</label>
+                        <select id="filtro-mes-pizza"></select>
                     </div>
                 </div>
-                <div class="charts-container-split" style="display: grid; grid-template-columns: 1.6fr 1fr; gap: 20px;">
+                <!-- CORREÇÃO PRINCIPAL: inline style removido, classe no lugar -->
+                <div class="charts-container-split">
                     <div class="chart-box"><canvas id="patrimonioChart"></canvas></div>
                     <div class="chart-box"><canvas id="pizzaChart"></canvas></div>
                 </div>
@@ -111,7 +113,7 @@
         </div>
 
         <section class="goal-section">
-            <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+            <div class="goal-header-row">
                 <div>
                     <div style="display: flex; align-items: center; gap: 10px;">
                         <h3 style="margin: 0;">Objetivo de Investimento</h3>
@@ -119,9 +121,9 @@
                     </div>
                     <p style="color: #86868b; font-size: 0.9rem;">As formigas estão trabalhando para você!</p>
                 </div>
-                <div style="text-align: right;">
-                    <span id="goal-percent-text" style="color: #f1f09d; font-weight: bold; font-size: 1.5rem;">0%</span>
-                    <p id="goal-value-text" style="color: #86868b; font-size: 0.85rem;">R$ 0 / R$ 10.000</p>
+                <div class="goal-percent-box">
+                    <span id="goal-percent-text">0%</span>
+                    <p id="goal-value-text">R$ 0 / R$ 10.000</p>
                 </div>
             </div>
 
@@ -166,7 +168,6 @@
     <script src="conexao/conexao.js"></script>
     <script src="conexao/dashboard.js"></script>
 
-    <!-- ═══ PWA: Registro do Service Worker ═══ -->
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
@@ -176,6 +177,5 @@
             });
         }
     </script>
-    <!-- ═══════════════════════════════════════ -->
 </body>
 </html>
