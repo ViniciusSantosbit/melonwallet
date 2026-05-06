@@ -6,7 +6,6 @@
     <title>Melon Wallet | Gestão Financeira</title>
     <link rel="icon" type="image/png" href="logo.png">
     <link rel="stylesheet" href="style.css">
-
     <!-- ═══ PWA ═══ -->
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#000000">
@@ -68,8 +67,82 @@
                     Já possui conta? <a href="#" onclick="toggleAuth()">Fazer login</a>
                 </div>
             </div>
+
         </div>
+
+        <!-- ═══ TAREFA 1: Seta de Scroll ═══ -->
+        <a href="#app-promo-section" class="scroll-arrow" aria-label="Ver mais">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                <path d="M12 5v14M5 12l7 7 7-7" stroke="#fdfd96" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span class="scroll-arrow-label">role para baixo</span>
+        </a>
+        <!-- ═══════════════════════════════ -->
     </div>
+
+    <!-- ═══ SEÇÃO ANÚNCIO DO APLICATIVO ═══ -->
+    <section id="app-promo-section" class="app-promo-section">
+        <div class="app-promo-content">
+            <div class="app-promo-text reveal">
+                <div class="app-promo-badge">🐜 NOVO</div>
+                <h2 class="app-promo-title">Seu patrimônio<br>no seu bolso.</h2>
+                <p class="app-promo-desc">Instale o Melon Wallet direto na sua tela inicial. Acesse seus gráficos, saldo e metas com um toque — sem abrir o navegador.</p>
+                <ul class="app-promo-features">
+                    <li><span class="feat-icon">⚡</span> Acesso instantâneo aos seus gráficos</li>
+                    <li><span class="feat-icon">📶</span> Funciona mesmo sem internet</li>
+                    <li><span class="feat-icon">🔒</span> Sessão salva com segurança</li>
+                    <li><span class="feat-icon">📱</span> Tela cheia, sem barra do navegador</li>
+                </ul>
+                <button class="btn-main app-promo-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+                    Instalar agora — é grátis
+                </button>
+            </div>
+
+            <div class="app-promo-phone reveal">
+                <div class="phone-mockup">
+                    <div class="phone-frame">
+                        <div class="phone-notch"></div>
+                        <div class="phone-screen">
+                            <div class="ps-statusbar"><span>9:41</span><span>📶 🔋</span></div>
+                            <div class="ps-navbar"><span class="ps-logo">🍈 melon</span><span class="ps-user">Olá, João</span></div>
+                            <div class="ps-balance-card">
+                                <span class="ps-label">Saldo Total</span>
+                                <span class="ps-value">R$ 12.840,00</span>
+                                <span class="ps-trend">↑ 8.3% vs mês passado</span>
+                            </div>
+                            <div class="ps-chart-area">
+                                <svg viewBox="0 0 200 50" class="ps-chart-svg">
+                                    <defs>
+                                        <linearGradient id="pg" x1="0%" y1="0%" x2="0%" y2="100%">
+                                            <stop offset="0%" style="stop-color:rgba(241,240,147,0.35)"/>
+                                            <stop offset="100%" style="stop-color:rgba(241,240,147,0)"/>
+                                        </linearGradient>
+                                    </defs>
+                                    <path d="M0,45 C30,30 60,40 90,20 S140,5 200,15 L200,50 L0,50Z" fill="url(#pg)"/>
+                                    <path d="M0,45 C30,30 60,40 90,20 S140,5 200,15" stroke="#f1f09d" stroke-width="1.5" fill="none"/>
+                                </svg>
+                            </div>
+                            <div class="ps-metrics">
+                                <div class="ps-metric"><span class="ps-m-label">Entradas</span><span class="ps-m-val green">R$ 8.429</span></div>
+                                <div class="ps-metric"><span class="ps-m-label">Saídas</span><span class="ps-m-val red">R$ 2.108</span></div>
+                                <div class="ps-metric"><span class="ps-m-label">Invest.</span><span class="ps-m-val gold">R$ 1.091</span></div>
+                            </div>
+                            <div class="ps-goal">
+                                <div class="ps-goal-header"><span>Meta 🐜</span><span class="gold">43%</span></div>
+                                <div class="ps-goal-bar">
+                                    <div class="ps-goal-fill" style="width:43%"><span class="ps-ant">🐜</span></div>
+                                    <span class="ps-melon-small">🍈</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="phone-home-bar"></div>
+                    </div>
+                    <div class="phone-glow"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- ════════════════════════════════ -->
 
     <section id="info-section" class="info-section">
         <div class="info-content">
@@ -86,14 +159,12 @@
                     </div>
                     <div class="filename">simulacao_financas — Melon</div>
                 </div>
-
                 <div class="mockup-tabs">
                     <div class="tab active">Tabela</div>
                     <div class="tab">Perfil</div>
                     <div class="tab">Grenciamento</div>
                     <div class="tab">Transformação</div>
                 </div>
-
                 <div class="mockup-body">
                     <div class="main-chart-container">
                         <svg viewBox="0 0 500 120" preserveAspectRatio="none" class="main-svg">
@@ -107,15 +178,11 @@
                             <path d="M0,100 C50,40 150,110 250,60 S400,20 500,50" stroke="#fdfd96" stroke-width="2" fill="none" class="chart-line" />
                         </svg>
                     </div>
-
                     <div class="table-wrapper">
                         <table>
                             <thead>
                                 <tr>
-                                    <th>DATA</th>
-                                    <th>RECURSO</th>
-                                    <th>CATEGORIA</th>
-                                    <th>VALOR</th>
+                                    <th>DATA</th><th>RECURSO</th><th>CATEGORIA</th><th>VALOR</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -126,10 +193,9 @@
                         </table>
                     </div>
                 </div>
-
                 <div class="mockup-footer">
-                    <div class="stat"><span>SALDO: <BR></BR></span><strong>R$ 3.841,33</strong></div>
-                    <div class="footer-info">melon 1.0 </div>
+                    <div class="stat"><span>SALDO:<br></span><strong>R$ 3.841,33</strong></div>
+                    <div class="footer-info">melon 1.0</div>
                 </div>
             </div>
         </div>
@@ -142,20 +208,17 @@
                 <h3>Segurança de Ponta</h3>
                 <p>Proteção de dados com criptografia via Supabase, garantindo que suas simulações estejam sempre seguras sob sua autenticação.</p>
             </div>
-
             <div class="feature-card reveal">
                 <div class="icon-box">🛡️</div>
                 <h3>Privacidade Total</h3>
                 <p>Seus dados financeiros não são rastreados. O Melon Wallet foca na sua autonomia e no sigilo absoluto das suas informações.</p>
             </div>
-
             <div class="feature-card reveal">
                 <div class="icon-box">🐜</div>
                 <h3>Gerente de Investimento</h3>
                 <p>Um simulador voltado para o seu investimento. Que organiza e contribui para o seu objetivo. O seu sonho é possivel com um ótimo controle de investimenta.</p>
             </div>
         </div>
-
         <div class="final-cta reveal">
             <h2>Pronto para transformar sua gestão?</h2>
             <button class="btn-main" onclick="mostrarCadastro()" style="max-width: 320px; margin: 0 auto;">Começar agora gratuitamente</button>
@@ -175,7 +238,7 @@
         </div>
     </footer>
 
-    <!-- ═══ PWA: Banner de Instalação ═══ -->
+    <!-- PWA: Banner de Instalação -->
     <div id="pwa-install-banner" style="display:none;">
         <div class="pwa-banner-content">
             <span class="pwa-banner-icon">🍈</span>
@@ -188,7 +251,7 @@
         </div>
     </div>
 
-    <!-- ═══ PWA: Modal de instrução iOS ═══ -->
+    <!-- PWA: Modal iOS -->
     <div id="ios-install-modal" style="display:none;">
         <div class="ios-modal-overlay" onclick="fecharModalIOS()"></div>
         <div class="ios-modal-card">
@@ -197,51 +260,36 @@
             <h3>Instalar no iPhone / iPad</h3>
             <p>Siga os passos abaixo para adicionar o Melon Wallet à sua tela de início:</p>
             <ol class="ios-steps">
-                <li>
-                    <span class="step-icon">⬆️</span>
-                    <span>Toque no botão <strong>Compartilhar</strong> no Safari (ícone de caixa com seta)</span>
-                </li>
-                <li>
-                    <span class="step-icon">➕</span>
-                    <span>Role a lista e selecione <strong>"Adicionar à Tela de Início"</strong></span>
-                </li>
-                <li>
-                    <span class="step-icon">✅</span>
-                    <span>Toque em <strong>Adicionar</strong> no canto superior direito</span>
-                </li>
+                <li><span class="step-icon">⬆️</span><span>Toque no botão <strong>Compartilhar</strong> no Safari</span></li>
+                <li><span class="step-icon">➕</span><span>Selecione <strong>"Adicionar à Tela de Início"</strong></span></li>
+                <li><span class="step-icon">✅</span><span>Toque em <strong>Adicionar</strong> no canto superior direito</span></li>
             </ol>
             <div class="ios-hint">O app abrirá em tela cheia, sem barra do navegador 🎉</div>
         </div>
     </div>
-    <!-- ════════════════════════════════ -->
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="conexao/conexao.js"></script>
     <script src="conexao/auth.js"></script>
 
-    <!-- ═══ PWA: Service Worker + Lógica de Instalação ═══ -->
     <script>
-        // ── Registro do Service Worker ──────────────────────────────────────
+        // PWA: Service Worker
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/sw.js')
-                    .then(reg => console.log('[PWA] Service Worker registrado:', reg.scope))
-                    .catch(err => console.error('[PWA] Erro no SW:', err));
+                    .then(reg => console.log('[PWA] SW registrado:', reg.scope))
+                    .catch(err => console.error('[PWA] Erro:', err));
             });
         }
 
-        // ── Detecções ───────────────────────────────────────────────────────
         const isIOS        = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-        const isStandalone = window.matchMedia('(display-mode: standalone)').matches
-                          || window.navigator.standalone === true;
-
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
         let deferredPrompt = null;
 
-        const banner      = document.getElementById('pwa-install-banner');
-        const btnInstall  = document.getElementById('pwa-btn-install');
-        const btnClose    = document.getElementById('pwa-btn-close');
+        const banner     = document.getElementById('pwa-install-banner');
+        const btnInstall = document.getElementById('pwa-btn-install');
+        const btnClose   = document.getElementById('pwa-btn-close');
 
-        // ── Android / Chrome: captura o prompt nativo ───────────────────────
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
@@ -254,7 +302,6 @@
             if (deferredPrompt) {
                 deferredPrompt.prompt();
                 const { outcome } = await deferredPrompt.userChoice;
-                console.log('[PWA] Escolha:', outcome);
                 deferredPrompt = null;
                 banner.style.display = 'none';
             }
@@ -270,7 +317,6 @@
             deferredPrompt = null;
         });
 
-        // ── iOS: instrução manual ────────────────────────────────────────────
         if (isIOS && !isStandalone && !sessionStorage.getItem('pwa-banner-dismissed')) {
             setTimeout(() => {
                 banner.style.display = 'block';
@@ -290,6 +336,5 @@
             document.body.style.overflow = '';
         }
     </script>
-    <!-- ══════════════════════════════════════════════════ -->
 </body>
 </html>

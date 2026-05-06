@@ -1021,3 +1021,587 @@ input[list]:focus {
         font-size: 0.8rem;
     }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   TAREFA 1 — Seta de Scroll Animada
+═══════════════════════════════════════════════════════════════ */
+.scroll-arrow {
+    position: absolute;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+    opacity: 0.6;
+    transition: opacity 0.3s;
+    animation: scrollBounce 2s ease-in-out infinite;
+}
+
+.scroll-arrow:hover { opacity: 1; }
+
+.scroll-arrow svg {
+    filter: drop-shadow(0 0 6px rgba(253, 253, 150, 0.4));
+}
+
+@keyframes scrollBounce {
+    0%, 100% { transform: translateX(-50%) translateY(0); opacity: 0.6; }
+    50%       { transform: translateX(-50%) translateY(8px); opacity: 1; }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   TAREFA 2 — Banner "Agora com Aplicativo"
+═══════════════════════════════════════════════════════════════ */
+.app-banner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 20px;
+    padding: 10px 16px;
+    background: rgba(241, 240, 147, 0.05);
+    border: 1px solid rgba(241, 240, 147, 0.15);
+    border-radius: 12px;
+    font-size: 0.78rem;
+    color: #86868b;
+    line-height: 1.4;
+    text-align: left;
+}
+
+.app-banner strong {
+    color: #f1f09d;
+    font-weight: 600;
+}
+
+.app-banner-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #32D74B;
+    flex-shrink: 0;
+    box-shadow: 0 0 6px #32D74B;
+    animation: pulse-dot 2s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+    0%, 100% { box-shadow: 0 0 4px #32D74B; transform: scale(1); }
+    50%       { box-shadow: 0 0 10px #32D74B; transform: scale(1.2); }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   CORREÇÃO: hero-auth precisa de position relative para a seta
+═══════════════════════════════════════════════════════════════ */
+.hero-auth {
+    position: relative;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SETA DE SCROLL — versão corrigida com label
+═══════════════════════════════════════════════════════════════ */
+.scroll-arrow {
+    position: absolute;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+    color: #fdfd96;
+    animation: scrollBounce 2s ease-in-out infinite;
+    z-index: 10;
+}
+
+.scroll-arrow-label {
+    font-size: 0.65rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(253, 253, 150, 0.5);
+    font-weight: 500;
+}
+
+.scroll-arrow svg {
+    filter: drop-shadow(0 0 8px rgba(253,253,150,0.5));
+}
+
+@keyframes scrollBounce {
+    0%, 100% { transform: translateX(-50%) translateY(0);   opacity: 0.7; }
+    50%       { transform: translateX(-50%) translateY(9px); opacity: 1;   }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SEÇÃO ANÚNCIO DO APP — grande e impactante
+═══════════════════════════════════════════════════════════════ */
+.app-promo-section {
+    padding: 100px 20px;
+    display: flex;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Gradiente de fundo sutil */
+.app-promo-section::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 60% 50%, rgba(241,240,147,0.04) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.app-promo-content {
+    max-width: 1100px;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+}
+
+/* --- Texto esquerdo --- */
+.app-promo-badge {
+    display: inline-block;
+    background: rgba(50, 215, 75, 0.1);
+    border: 1px solid rgba(50, 215, 75, 0.3);
+    color: #32D74B;
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    margin-bottom: 24px;
+}
+
+.app-promo-title {
+    font-size: 3.8rem;
+    font-weight: 800;
+    letter-spacing: -2px;
+    line-height: 1;
+    margin-bottom: 20px;
+    color: #fff;
+}
+
+.app-promo-desc {
+    color: #86868b;
+    font-size: 1.05rem;
+    line-height: 1.6;
+    margin-bottom: 32px;
+    max-width: 420px;
+}
+
+.app-promo-features {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 36px;
+}
+
+.app-promo-features li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.95rem;
+    color: #c0c0c0;
+}
+
+.feat-icon {
+    font-size: 1.1rem;
+    width: 28px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.app-promo-btn {
+    max-width: 280px;
+    font-size: 1rem;
+}
+
+/* --- Mockup do celular (direita) --- */
+.app-promo-phone {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.phone-mockup {
+    position: relative;
+    display: inline-block;
+}
+
+.phone-glow {
+    position: absolute;
+    inset: -30px;
+    background: radial-gradient(ellipse at center, rgba(241,240,147,0.12) 0%, transparent 70%);
+    z-index: 0;
+    pointer-events: none;
+    border-radius: 50%;
+}
+
+.phone-frame {
+    position: relative;
+    z-index: 1;
+    width: 240px;
+    background: #0a0a0a;
+    border-radius: 36px;
+    border: 2px solid rgba(255,255,255,0.12);
+    box-shadow:
+        0 0 0 1px rgba(241,240,147,0.08),
+        0 40px 80px rgba(0,0,0,0.8),
+        inset 0 1px 0 rgba(255,255,255,0.06);
+    overflow: hidden;
+    padding-bottom: 24px;
+}
+
+.phone-notch {
+    width: 80px;
+    height: 22px;
+    background: #0a0a0a;
+    border-radius: 0 0 16px 16px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 2;
+    border: 2px solid rgba(255,255,255,0.08);
+    border-top: none;
+}
+
+.phone-screen {
+    padding: 8px 12px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.phone-home-bar {
+    width: 80px;
+    height: 4px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 4px;
+    margin: 10px auto 0;
+}
+
+/* Elementos internos da tela do celular */
+.ps-statusbar {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.55rem;
+    color: rgba(255,255,255,0.5);
+    padding: 2px 0;
+}
+
+.ps-navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.ps-logo {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #f1f09d;
+}
+
+.ps-user {
+    font-size: 0.58rem;
+    color: #86868b;
+}
+
+.ps-balance-card {
+    background: rgba(241,240,147,0.06);
+    border: 1px solid rgba(241,240,147,0.15);
+    border-radius: 12px;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.ps-label {
+    font-size: 0.55rem;
+    color: #86868b;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.ps-value {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #fff;
+    font-family: monospace;
+    letter-spacing: -0.5px;
+}
+
+.ps-trend {
+    font-size: 0.58rem;
+    color: #32D74B;
+}
+
+.ps-chart-area {
+    background: rgba(255,255,255,0.02);
+    border-radius: 8px;
+    padding: 6px 4px 2px;
+    height: 50px;
+    overflow: hidden;
+}
+
+.ps-chart-svg {
+    width: 100%;
+    height: 100%;
+}
+
+.ps-metrics {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 6px;
+}
+
+.ps-metric {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 8px;
+    padding: 6px 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    text-align: center;
+}
+
+.ps-m-label {
+    font-size: 0.5rem;
+    color: #484f58;
+    text-transform: uppercase;
+}
+
+.ps-m-val {
+    font-size: 0.6rem;
+    font-weight: 700;
+    font-family: monospace;
+}
+
+.ps-m-val.green { color: #32D74B; }
+.ps-m-val.red   { color: #ff453a; }
+.ps-m-val.gold  { color: #f1f09d; }
+
+.ps-goal {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 8px;
+    padding: 8px 10px;
+}
+
+.ps-goal-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.58rem;
+    color: #86868b;
+    margin-bottom: 6px;
+}
+
+.ps-goal-header .gold { color: #f1f09d; font-weight: 700; }
+
+.ps-goal-bar {
+    width: 100%;
+    height: 8px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 10px;
+    position: relative;
+}
+
+.ps-goal-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #f1f09d, #32D74B);
+    border-radius: 10px;
+    position: relative;
+}
+
+.ps-ant {
+    position: absolute;
+    right: -8px;
+    top: -10px;
+    font-size: 14px;
+}
+
+.ps-melon-small {
+    position: absolute;
+    right: -4px;
+    top: -14px;
+    font-size: 18px;
+}
+
+/* Mobile: empilhar coluna */
+@media (max-width: 768px) {
+    .app-promo-content {
+        grid-template-columns: 1fr;
+        gap: 50px;
+        text-align: center;
+    }
+
+    .app-promo-title {
+        font-size: 2.6rem;
+    }
+
+    .app-promo-desc {
+        max-width: 100%;
+    }
+
+    .app-promo-features {
+        align-items: flex-start;
+        text-align: left;
+    }
+
+    .app-promo-btn {
+        margin: 0 auto;
+    }
+
+    .app-promo-badge {
+        display: inline-block;
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MOBILE FIX — responsividade completa para todos os tamanhos
+   Problema: glass-card tinha width:400px fixo causando overflow
+═══════════════════════════════════════════════════════════════ */
+
+/* Garante que nada vaze horizontalmente em nenhum elemento */
+html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+/* --- Glass card do login: fluido em mobile --- */
+.glass-card {
+    width: min(400px, calc(100vw - 32px));
+    box-sizing: border-box;
+}
+
+/* --- Navbar: não deixar links quebrarem em telas médias --- */
+@media (max-width: 600px) {
+    .nav-links {
+        gap: 12px;
+    }
+
+    .nav-item {
+        display: none; /* esconde o link "Conheça o gerenciamento" em mobile */
+    }
+
+    .nav-content {
+        padding: 0 16px;
+    }
+}
+
+/* --- Hero: padding para o card não encostar nas bordas --- */
+.hero-auth {
+    padding: 80px 16px 80px;
+    box-sizing: border-box;
+    align-items: center;
+}
+
+/* --- Inputs e botões dentro do card --- */
+@media (max-width: 480px) {
+    .glass-card {
+        padding: 32px 24px;
+        border-radius: 24px;
+    }
+
+    .logo-melon {
+        width: 80px;
+    }
+
+    .brand-name {
+        font-size: 1.3rem;
+    }
+
+    input {
+        padding: 14px;
+        font-size: 0.9rem;
+    }
+
+    .btn-main {
+        padding: 14px;
+        font-size: 0.95rem;
+    }
+
+    /* Seta de scroll fica mais discreta em mobile */
+    .scroll-arrow {
+        bottom: 16px;
+    }
+
+    .scroll-arrow-label {
+        display: none;
+    }
+}
+
+/* --- Seção promo do app: ajuste mobile fino --- */
+@media (max-width: 480px) {
+    .app-promo-title {
+        font-size: 2.2rem;
+        letter-spacing: -1px;
+    }
+
+    .phone-frame {
+        width: 200px;
+    }
+
+    .ps-value {
+        font-size: 0.95rem;
+    }
+}
+
+/* --- Títulos grandes da landing: não vazar --- */
+@media (max-width: 480px) {
+    .main-title {
+        font-size: 2.4rem;
+        letter-spacing: -1px;
+    }
+
+    .description-text {
+        font-size: 1.1rem;
+    }
+
+    .final-cta h2 {
+        font-size: 1.8rem;
+    }
+
+    .info-section {
+        padding: 80px 16px;
+    }
+
+    .features-section {
+        padding: 60px 16px;
+    }
+
+    .feature-card {
+        padding: 28px 24px;
+    }
+}
+
+/* --- Dashboard mobile: header não cortar --- */
+@media (max-width: 480px) {
+    .dashboard-container {
+        padding: 24px 14px;
+    }
+
+    .dash-header h1 {
+        font-size: 1.6rem;
+    }
+
+    .btn-add-simulacao {
+        width: 100%;
+        padding: 12px;
+        font-size: 0.9rem;
+    }
+
+    .metric-card h2 {
+        font-size: 1.5rem;
+    }
+
+    .glass-card-dash {
+        padding: 18px 14px;
+    }
+}
