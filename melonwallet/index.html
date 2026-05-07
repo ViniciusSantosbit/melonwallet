@@ -67,22 +67,21 @@
                     Já possui conta? <a href="#" onclick="toggleAuth()">Fazer login</a>
                 </div>
             </div>
-
         </div>
 
-        <!-- ═══ TAREFA 1: Seta de Scroll ═══ -->
         <a href="#app-promo-section" class="scroll-arrow" aria-label="Ver mais">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
                 <path d="M12 5v14M5 12l7 7 7-7" stroke="#fdfd96" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
             <span class="scroll-arrow-label">role para baixo</span>
         </a>
-        <!-- ═══════════════════════════════ -->
     </div>
 
     <!-- ═══ SEÇÃO ANÚNCIO DO APLICATIVO ═══ -->
     <section id="app-promo-section" class="app-promo-section">
         <div class="app-promo-content">
+
+            <!-- TEXTO ESQUERDO -->
             <div class="app-promo-text reveal">
                 <div class="app-promo-badge">🐜 NOVO</div>
                 <h2 class="app-promo-title">Seu patrimônio<br>no seu bolso.</h2>
@@ -98,48 +97,19 @@
                 </button>
             </div>
 
+            <!-- CELULAR DIREITO — imagem real -->
             <div class="app-promo-phone reveal">
-                <div class="phone-mockup">
-                    <div class="phone-frame">
-                        <div class="phone-notch"></div>
-                        <div class="phone-screen">
-                            <div class="ps-statusbar"><span>9:41</span><span>📶 🔋</span></div>
-                            <div class="ps-navbar"><span class="ps-logo">🍈 melon</span><span class="ps-user">Olá, João</span></div>
-                            <div class="ps-balance-card">
-                                <span class="ps-label">Saldo Total</span>
-                                <span class="ps-value">R$ 12.840,00</span>
-                                <span class="ps-trend">↑ 8.3% vs mês passado</span>
-                            </div>
-                            <div class="ps-chart-area">
-                                <svg viewBox="0 0 200 50" class="ps-chart-svg">
-                                    <defs>
-                                        <linearGradient id="pg" x1="0%" y1="0%" x2="0%" y2="100%">
-                                            <stop offset="0%" style="stop-color:rgba(241,240,147,0.35)"/>
-                                            <stop offset="100%" style="stop-color:rgba(241,240,147,0)"/>
-                                        </linearGradient>
-                                    </defs>
-                                    <path d="M0,45 C30,30 60,40 90,20 S140,5 200,15 L200,50 L0,50Z" fill="url(#pg)"/>
-                                    <path d="M0,45 C30,30 60,40 90,20 S140,5 200,15" stroke="#f1f09d" stroke-width="1.5" fill="none"/>
-                                </svg>
-                            </div>
-                            <div class="ps-metrics">
-                                <div class="ps-metric"><span class="ps-m-label">Entradas</span><span class="ps-m-val green">R$ 8.429</span></div>
-                                <div class="ps-metric"><span class="ps-m-label">Saídas</span><span class="ps-m-val red">R$ 2.108</span></div>
-                                <div class="ps-metric"><span class="ps-m-label">Invest.</span><span class="ps-m-val gold">R$ 1.091</span></div>
-                            </div>
-                            <div class="ps-goal">
-                                <div class="ps-goal-header"><span>Meta 🐜</span><span class="gold">43%</span></div>
-                                <div class="ps-goal-bar">
-                                    <div class="ps-goal-fill" style="width:43%"><span class="ps-ant">🐜</span></div>
-                                    <span class="ps-melon-small">🍈</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="phone-home-bar"></div>
-                    </div>
-                    <div class="phone-glow"></div>
+                <div class="phone-img-wrapper">
+                    <div class="phone-img-glow"></div>
+                    <img
+                        src="phone.png"
+                        alt="Melon Wallet no celular"
+                        class="phone-real-img"
+                        draggable="false"
+                    >
                 </div>
             </div>
+
         </div>
     </section>
     <!-- ════════════════════════════════ -->
@@ -181,9 +151,7 @@
                     <div class="table-wrapper">
                         <table>
                             <thead>
-                                <tr>
-                                    <th>DATA</th><th>RECURSO</th><th>CATEGORIA</th><th>VALOR</th>
-                                </tr>
+                                <tr><th>DATA</th><th>RECURSO</th><th>CATEGORIA</th><th>VALOR</th></tr>
                             </thead>
                             <tbody>
                                 <tr><td>2026-04-17</td><td class="text-neon">SALÁRIO</td><td>LATAM</td><td>R$ 8.429,14</td></tr>
@@ -273,7 +241,6 @@
     <script src="conexao/auth.js"></script>
 
     <script>
-        // PWA: Service Worker
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/sw.js')
