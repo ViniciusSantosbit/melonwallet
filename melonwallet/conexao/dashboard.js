@@ -194,7 +194,7 @@ function renderizarGraficoPizza(labels, valores) {
     if (meuGraficoPizza) meuGraficoPizza.destroy();
     meuGraficoPizza = new Chart(ctx, {
         type: 'doughnut',
-        data: { labels, datasets: [{ data: valores, backgroundColor: ['#efeb03', '#c26f03', '#32D74B', '#9370DB', '#ee170c', '#f099b3', '#0000ff', '#ccc3c3', '#20b2aa'], borderWidth: 0 }] },
+        data: { labels, datasets: [{ data: valores, backgroundColor: ['#efeb03', '#c26f03', '#32D74B', '#9370DB', '#ee170c', '#f099b3', '#0000ff', '#ccc3c3', '#20b2aa' , '#008080' , '#BDB76B' , '#F5DEB3' , '#FA8072' , '#2F4F4F' , '#D8BFD8'], borderWidth: 0 }] },
         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { color: '#888b86', usePointStyle: true } }, datalabels: { display: false } } }
     });
 }
