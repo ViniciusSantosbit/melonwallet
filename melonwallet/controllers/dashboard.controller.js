@@ -15,6 +15,7 @@ import {
 import { renderGoalProgress, renderTopExpenses } from '../components/goals.component.js';
 import { renderSimulacoesTable } from '../components/table.component.js';
 import { criarSimulacao, deletarSimulacao, listarSimulacoes } from '../services/simulacoes.service.js';
+import { escanearComprovante } from '../services/ocr.service.js';
 import { getUserId, getUserName } from '../storage/session.storage.js';
 import { getMetaInvestimento, setMetaInvestimento } from '../storage/meta.storage.js';
 import { logout, requireAuth } from '../services/session.service.js';
@@ -99,6 +100,37 @@ function editarMeta() {
     }
 }
 
+async function abrirSeletorOCR() {
+    const input = document.getElementById('ocr-file-input');
+    if (!input) return;
+
+    input.value = '';
+    input.click();
+}
+
+function initOcrFileHandler() {
+    const input = document.getElementById('ocr-file-input');
+    if (!input) return;
+
+    input.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        try {
+            const dados = await escanearComprovante(file);
+            alert(
+                `Comprovante escaneado com sucesso!\n\n` +
+                `Estabelecimento: ${dados.merchant_name || 'N/A'}\n` +
+                `Data: ${dados.date || 'N/A'}\n` +
+                `Valor: ${dados.total_amount ? 'R$ ' + dados.total_amount : 'N/A'}\n` +
+                `Confiança: ${dados.confidence ? (dados.confidence * 100).toFixed(1) + '%' : 'N/A'}`
+            );
+        } catch (error) {
+            alert('Erro ao escanear: ' + error.message);
+        }
+    });
+}
+
 function initSimulacaoForm() {
     const formSim = document.getElementById('formSimulacao');
     if (!formSim) return;
@@ -142,6 +174,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     initSimulacaoForm();
+    initOcrFileHandler();
     await carregarDados();
     hideLoader();
 });
@@ -154,3 +187,4 @@ window.fecharModal = fecharModal;
 window.alternarVisualizacaoSaldo = alternarVisualizacaoSaldo;
 window.editarMeta = editarMeta;
 window.deletarSimulacao = handleDeleteSimulacao;
+window.abrirSeletorOCR = abrirSeletorOCR;

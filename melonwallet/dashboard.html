@@ -56,6 +56,10 @@
                 <p>Gerencie seu patrimônio com a inteligência do Melão.</p>
             </div>
             <button class="btn-add-simulacao" onclick="abrirModal()">+ Nova Simulação</button>
+            <button class="btn-scan-receipt" onclick="abrirSeletorOCR()">
+                <span class="scan-icon">📷</span> Escanear Comprovante
+            </button>
+            <input type="file" id="ocr-file-input" accept="image/*,application/pdf" capture="environment" style="display: none;">
         </header>
 
         <div class="metrics-grid">
