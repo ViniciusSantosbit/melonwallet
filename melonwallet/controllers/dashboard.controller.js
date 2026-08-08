@@ -1,0 +1,156 @@
+import '../config/supabase.js';
+import { registerChartPlugins } from '../charts/chart-registry.js';
+import { renderBarChart } from '../charts/bar-chart.js';
+import { renderPieChart } from '../charts/pie-chart.js';
+import { hideLoader } from '../components/loader.component.js';
+import { abrirModal, fecharModal } from '../components/modal.component.js';
+import {
+    alternarVisualizacaoSaldo,
+    populateMonthSelector,
+    setCurrentDate,
+    setDefaultMonthInput,
+    setGreeting,
+    updateMetrics,
+} from '../components/metrics.component.js';
+import { renderGoalProgress, renderTopExpenses } from '../components/goals.component.js';
+import { renderSimulacoesTable } from '../components/table.component.js';
+import { criarSimulacao, deletarSimulacao, listarSimulacoes } from '../services/simulacoes.service.js';
+import { getUserId, getUserName } from '../storage/session.storage.js';
+import { getMetaInvestimento, setMetaInvestimento } from '../storage/meta.storage.js';
+import { logout, requireAuth } from '../services/session.service.js';
+import {
+    aggregateExpensesByName,
+    aggregatePieChartData,
+    computeBalances,
+    computeGoalProgress,
+    computeTotalInvestments,
+    getTopExpenses,
+} from '../utils/finance.util.js';
+import { getCurrentMonthInput, getLongDateString } from '../utils/dates.util.js';
+import { registerServiceWorker } from '../pwa/register-sw.js';
+
+registerChartPlugins();
+
+let todasSimulacoes = [];
+let metaValor = getMetaInvestimento();
+
+function atualizarInsightsEMetas(mesSel) {
+    metaValor = getMetaInvestimento();
+
+    const gastos = aggregateExpensesByName(todasSimulacoes, mesSel);
+    const investTotal = computeTotalInvestments(todasSimulacoes);
+    const progresso = computeGoalProgress(investTotal, metaValor);
+    const topGastos = getTopExpenses(gastos);
+
+    renderGoalProgress({ progresso, investTotal, metaValor });
+    renderTopExpenses(topGastos);
+}
+
+function atualizarPizzaPorMes(mes) {
+    const { labels, valores } = aggregatePieChartData(todasSimulacoes, mes);
+    renderPieChart(labels, valores);
+}
+
+async function carregarDados() {
+    const userId = getUserId();
+    const { data: sims, error } = await listarSimulacoes(userId);
+
+    if (error) return;
+
+    todasSimulacoes = sims;
+
+    const balances = computeBalances(sims);
+
+    updateMetrics({
+        saldoGlobal: balances.saldoTotal,
+        saldoMesAtual: balances.saldoMesAtual,
+        tendencia: balances.tendenciaCalculada,
+        corTendencia: balances.corTendenciaCalculada,
+        totalSimulacoes: sims.length,
+        lucroPrevisto: balances.saldoTotal * 0.01,
+    });
+
+    const seletor = populateMonthSelector(balances.mesesComDados);
+
+    if (balances.mesesComDados.length > 0) {
+        const ultimo = balances.mesesComDados[balances.mesesComDados.length - 1];
+        seletor.value = ultimo;
+        atualizarPizzaPorMes(ultimo);
+        atualizarInsightsEMetas(ultimo);
+    }
+
+    renderBarChart(balances.mesesComDados, sims);
+    renderSimulacoesTable(sims, handleDeleteSimulacao);
+}
+
+async function handleDeleteSimulacao(id) {
+    if (!confirm('Excluir registro?')) return;
+    await deletarSimulacao(id);
+    await carregarDados();
+}
+
+function editarMeta() {
+    const novoValor = prompt('Nova meta de investimento (R$):', metaValor);
+    if (novoValor && !isNaN(novoValor)) {
+        metaValor = parseFloat(novoValor);
+        setMetaInvestimento(metaValor);
+        const seletor = document.getElementById('filtro-mes-pizza');
+        atualizarInsightsEMetas(seletor.value || '');
+    }
+}
+
+function initSimulacaoForm() {
+    const formSim = document.getElementById('formSimulacao');
+    if (!formSim) return;
+
+    formSim.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const novaSim = {
+            user_id: getUserId(),
+            nome: document.getElementById('sim-nome').value,
+            tipo: document.getElementById('sim-tipo').value,
+            valor: parseFloat(document.getElementById('sim-valor').value),
+            mes_referencia: document.getElementById('sim-mes').value + '-01',
+        };
+
+        const { error } = await criarSimulacao(novaSim);
+
+        if (error) {
+            alert('Erro ao salvar: ' + error.message);
+        } else {
+            fecharModal();
+            formSim.reset();
+            await carregarDados();
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+    if (!requireAuth()) return;
+
+    setGreeting(getUserName());
+    setCurrentDate(getLongDateString());
+    setDefaultMonthInput(getCurrentMonthInput());
+
+    const seletor = document.getElementById('filtro-mes-pizza');
+    if (seletor) {
+        seletor.addEventListener('change', (e) => {
+            atualizarPizzaPorMes(e.target.value);
+            atualizarInsightsEMetas(e.target.value);
+        });
+    }
+
+    initSimulacaoForm();
+    await carregarDados();
+    hideLoader();
+});
+
+registerServiceWorker('[PWA] SW ativo no dashboard:');
+
+window.logout = logout;
+window.abrirModal = abrirModal;
+window.fecharModal = fecharModal;
+window.alternarVisualizacaoSaldo = alternarVisualizacaoSaldo;
+window.editarMeta = editarMeta;
+window.deletarSimulacao = handleDeleteSimulacao;

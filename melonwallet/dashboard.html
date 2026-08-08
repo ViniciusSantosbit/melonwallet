@@ -165,17 +165,6 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="conexao/conexao.js"></script>
-    <script src="conexao/dashboard.js"></script>
-
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
-                    .then(reg => console.log('[PWA] SW ativo no dashboard:', reg.scope))
-                    .catch(err => console.error('[PWA] Erro no SW:', err));
-            });
-        }
-    </script>
+    <script type="module" src="controllers/dashboard.controller.js"></script>
 </body>
 </html>

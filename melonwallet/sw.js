@@ -1,22 +1,39 @@
 // sw.js — Service Worker do Melon Wallet
 // Estratégia: Cache-First para assets estáticos, Network-First para dados do Supabase
 
-const CACHE_NAME = 'melon-wallet-v1';
+const CACHE_NAME = 'melon-wallet-v2';
 const OFFLINE_URL = '/offline.html';
 
-// Arquivos que serão cacheados na instalação (App Shell)
 const APP_SHELL = [
   '/',
   '/index.html',
   '/dashboard.html',
   '/style.css',
-  '/conexao/auth.js',
-  '/conexao/dashboard.js',
-  '/conexao/conexao.js',
+  '/offline.html',
   '/logo.png',
   '/fundo.png',
-  '/offline.html',
-  // CDNs essenciais
+  '/config/constants.js',
+  '/config/supabase.js',
+  '/controllers/landing.controller.js',
+  '/controllers/dashboard.controller.js',
+  '/services/auth.service.js',
+  '/services/simulacoes.service.js',
+  '/services/session.service.js',
+  '/utils/format.util.js',
+  '/utils/dates.util.js',
+  '/utils/finance.util.js',
+  '/storage/session.storage.js',
+  '/storage/meta.storage.js',
+  '/charts/chart-registry.js',
+  '/charts/bar-chart.js',
+  '/charts/pie-chart.js',
+  '/components/loader.component.js',
+  '/components/modal.component.js',
+  '/components/metrics.component.js',
+  '/components/table.component.js',
+  '/components/goals.component.js',
+  '/pwa/register-sw.js',
+  '/pwa/install-banner.js',
   'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',
   'https://cdn.jsdelivr.net/npm/chart.js',
   'https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2'
