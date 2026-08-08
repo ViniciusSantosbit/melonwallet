@@ -77,6 +77,11 @@ self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
+  // 0. Ignora requisições POST e chamadas para a API (deixa passar direto para a internet)
+  if (request.method !== 'GET' || request.url.includes('/api/')) {
+    return;
+  }
+
   // 1. Requisições ao Supabase → sempre Network-First (dados em tempo real)
   if (url.hostname.includes('supabase')) {
     event.respondWith(networkFirst(request));

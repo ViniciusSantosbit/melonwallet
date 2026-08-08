@@ -1,62 +1,46 @@
-export default async function handler(req, res) {
-    if (req.method !== 'POST') {
-        return res.status(405).json({ error: 'Method not allowed' });
-    }
+export const config = {
+    runtime: 'edge',
+};
 
-    const apiKey = process.env.MINDEE_API_KEY;
-    if (!apiKey) {
-        return res.status(500).json({ error: 'API key not configured' });
+export default async function handler(req) {
+    // 1. Verifica se é uma requisição POST
+    if (req.method !== 'POST') {
+        return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+            status: 405,
+            headers: { 'Content-Type': 'application/json' },
+        });
     }
 
     try {
+        // 2. Recebe a imagem (apenas para validar que o upload funcionou)
         const formData = await req.formData();
         const file = formData.get('document');
 
         if (!file) {
-            return res.status(400).json({ error: 'Nenhum documento enviado' });
+            return new Response(JSON.stringify({ error: 'Nenhum documento enviado' }), {
+                status: 400,
+                headers: { 'Content-Type': 'application/json' },
+            });
         }
 
-        const mindeeForm = new FormData();
-        mindeeForm.append('document', file, file.name || 'receipt.jpg');
+        // 3. O TRUQUE: Simula o tempo de processamento de uma IA (1.5 segundos)
+        await new Promise((resolve) => setTimeout(resolve, 1500));
 
-        const response = await fetch('https://api.mindee.net/v2/products/mindee/receipts/v2/parse', {
-            method: 'POST',
-            headers: {
-                'Authorization': `Token ${apiKey}`,
-            },
-            body: mindeeForm,
+        // 4. Retorna os dados simulados no formato exato que o seu frontend espera
+        return new Response(JSON.stringify({
+            merchant_name: "Mercado Simulação (Mock)",
+            date: new Date().toISOString().split('T')[0], // Retorna a data de hoje
+            total_amount: 149.90, // O valor simulado que vai para o app
+            confidence: 0.99,
+        }), {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' },
         });
 
-        if (!response.ok) {
-            const text = await response.text();
-            return res.status(response.status).json({ error: `Mindee API error: ${text}` });
-        }
-
-        const data = await response.json();
-
-        const prediction = data?.document?.inference?.prediction || {};
-
-        const merchantName = prediction.merchant_name?.value || null;
-        const date = prediction.date?.value || null;
-        const totalAmount = prediction.total_amount?.value || null;
-
-        const confidences = [
-            prediction.merchant_name?.confidence,
-            prediction.date?.confidence,
-            prediction.total_amount?.confidence,
-        ].filter((c) => typeof c === 'number');
-
-        const confidence = confidences.length > 0
-            ? confidences.reduce((a, b) => a + b, 0) / confidences.length
-            : null;
-
-        res.status(200).json({
-            merchant_name: merchantName,
-            date: date,
-            total_amount: totalAmount,
-            confidence: confidence,
-        });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        return new Response(JSON.stringify({ error: error.message }), {
+            status: 500,
+            headers: { 'Content-Type': 'application/json' },
+        });
     }
 }
