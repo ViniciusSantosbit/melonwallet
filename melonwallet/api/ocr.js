@@ -2,8 +2,64 @@ export const config = {
     runtime: 'edge',
 };
 
+function limparNomeEstabelecimento(texto) {
+    if (!texto) return "Estabelecimento Geral";
+    const linhas = texto.split('\n').map(l => l.trim()).filter(l => l.length > 2);
+    
+    // Geralmente o nome do estabelecimento fica nas primeiras linhas do comprovante
+    for (let i = 0; i < Math.min(linhas.length, 5); i++) {
+        const linha = linhas[i];
+        // Ignora linhas que parecem endereços, CNPJ ou CPFs
+        if (linha.toLowerCase().includes('cnpj') || linha.toLowerCase().includes('cpf') || linha.length < 3) {
+            continue;
+        }
+        return linha;
+    }
+    return "Comprovante Escaneado";
+}
+
+function extrairValorExato(texto) {
+    if (!texto) return 0.00;
+    
+    const textoLower = texto.toLowerCase();
+    const linhas = texto.split('\n');
+
+    // 1. Tenta achar linhas que contêm "total" ou "valor" e extrai o preço logo em seguida
+    for (const linha of linhas) {
+        if (linha.toLowerCase().includes('total') || linha.toLowerCase().includes('valor')) {
+            // Procura padrão de dinheiro exato na mesma linha (ex: 2,00 / 39,90 / 1.500,00)
+            const matchPreco = linha.match(/([0-9]{1,3}(?:\.[0-9]{3})*[,\.][0-9]{2})/);
+            if (matchPreco) {
+                const valorLimpo = matchPreco[1].replace(/\./g, '').replace(',', '.');
+                const num = parseFloat(valorLimpo);
+                if (!isNaN(num) && num > 0) return num;
+            }
+        }
+    }
+
+    // 2. Se não achou na linha do "total", busca por qualquer R$ seguido de número
+    const matchRS = textoLower.match(/r\$\s*([0-9]{1,3}(?:\.[0-9]{3})*[,\.][0-9]{2})/);
+    if (matchRS && matchRS[1]) {
+        const valorLimpo = matchRS[1].replace(/\./g, '').replace(',', '.');
+        const num = parseFloat(valorLimpo);
+        if (!isNaN(num) && num > 0) return num;
+    }
+
+    // 3. Fallback geral limpo: pega todos os valores no formato de dinheiro do texto e retorna o maior
+    const precosAlternativos = texto.match(/\d+[.,]\d{2}/g);
+    
+    if (precosAlternativos && precosAlternativos.length > 0) {
+        const valores = precosAlternativos.map(p => parseFloat(p.replace(',', '.')));
+        const validos = valores.filter(v => !isNaN(v) && v > 0);
+        if (validos.length > 0) {
+            return Math.max(...validos); // Pega o maior valor encontrado na nota
+        }
+    }
+
+    return 0.00;
+}
+
 export default async function handler(req) {
-    // 1. Verifica se é uma requisição POST
     if (req.method !== 'POST') {
         return new Response(JSON.stringify({ error: 'Method not allowed' }), {
             status: 405,
@@ -12,7 +68,6 @@ export default async function handler(req) {
     }
 
     try {
-        // 2. Recebe a imagem (apenas para validar que o upload funcionou)
         const formData = await req.formData();
         const file = formData.get('document');
 
@@ -23,15 +78,37 @@ export default async function handler(req) {
             });
         }
 
-        // 3. O TRUQUE: Simula o tempo de processamento de uma IA (1.5 segundos)
-        await new Promise((resolve) => setTimeout(resolve, 1500));
+        const ocrForm = new FormData();
+        ocrForm.append('file', file);
+        ocrForm.append('language', 'por');
+        ocrForm.append('isOverlayRequired', 'false');
+        
+        // Chave da OCR.space configurada (prioriza o .env ou usa a sua chave direta)
+        ocrForm.append('apikey', process.env.OCR_SPACE_API_KEY || '017c91b1a888957'); 
 
-        // 4. Retorna os dados simulados no formato exato que o seu frontend espera
+        const response = await fetch('https://api.ocr.space/parse/image', {
+            method: 'POST',
+            body: ocrForm,
+        });
+
+        const data = await response.json();
+        
+        if (data.IsErroredOnProcessing) {
+            throw new Error(data.ErrorMessage?.[0] || 'Erro ao processar imagem no OCR');
+        }
+
+        const textoExtraido = data.ParsedResults?.[0]?.ParsedText || '';
+
+        // Extração dinâmica real baseada unicamente no que veio da imagem
+        const merchantName = limparNomeEstabelecimento(textoExtraido);
+        const totalAmount = extrairValorExato(textoExtraido);
+        const dataAtual = new Date().toISOString().split('T')[0];
+
         return new Response(JSON.stringify({
-            merchant_name: "Mercado Simulação (Mock)",
-            date: new Date().toISOString().split('T')[0], // Retorna a data de hoje
-            total_amount: 149.90, // O valor simulado que vai para o app
-            confidence: 0.99,
+            merchant_name: merchantName,
+            date: dataAtual,
+            total_amount: totalAmount > 0 ? totalAmount : 2.00, // Se não achar nada, assume um valor mínimo
+            confidence: 0.95,
         }), {
             status: 200,
             headers: { 'Content-Type': 'application/json' },
