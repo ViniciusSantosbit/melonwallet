@@ -118,14 +118,35 @@ function initOcrFileHandler() {
 
         try {
             const dados = await escanearComprovante(file);
+            
+            const novaSimulacaoOCR = {
+                user_id: getUserId(),
+                nome: dados.merchant_name || 'Estabelecimento Escaneado',
+                tipo: 'despesa', // Pode ser que o Supabase espere 'Gasto', 'saida' ou outra palavra
+                valor: parseFloat(dados.total_amount) || 0,
+                mes_referencia: dados.date ? dados.date.substring(0, 7) + '-01' : new Date().toISOString().substring(0, 7) + '-01',
+            };
+
+            console.log("DADOS ENVIADOS PARA O BANCO:", novaSimulacaoOCR);
+
+            const { error } = await criarSimulacao(novaSimulacaoOCR);
+
+            if (error) {
+                console.error("ERRO DO SUPABASE:", error);
+                alert('Erro ao salvar no banco: ' + error.message);
+                return;
+            }
+
+            await carregarDados();
+
             alert(
-                `Comprovante escaneado com sucesso!\n\n` +
-                `Estabelecimento: ${dados.merchant_name || 'N/A'}\n` +
+                `Comprovante escaneado e salvo com sucesso!\n\n` +
+                `Estabelecimento: ${novaSimulacaoOCR.nome}\n` +
                 `Data: ${dados.date || 'N/A'}\n` +
-                `Valor: ${dados.total_amount ? 'R$ ' + dados.total_amount : 'N/A'}\n` +
-                `Confiança: ${dados.confidence ? (dados.confidence * 100).toFixed(1) + '%' : 'N/A'}`
+                `Valor: R$ ${novaSimulacaoOCR.valor.toFixed(2)}`
             );
         } catch (error) {
+            console.error("ERRO NO TRY/CATCH:", error);
             alert('Erro ao escanear: ' + error.message);
         }
     });
