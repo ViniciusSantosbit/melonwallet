@@ -83,7 +83,6 @@ export default async function handler(req) {
         ocrForm.append('language', 'por');
         ocrForm.append('isOverlayRequired', 'false');
         
-        // Chave da OCR.space configurada (prioriza o .env ou usa a sua chave direta)
         ocrForm.append('apikey', process.env.OCR_SPACE_API_KEY || '017c91b1a888957'); 
 
         const response = await fetch('https://api.ocr.space/parse/image', {
@@ -94,12 +93,25 @@ export default async function handler(req) {
         const data = await response.json();
         
         if (data.IsErroredOnProcessing) {
-            throw new Error(data.ErrorMessage?.[0] || 'Erro ao processar imagem no OCR');
+            const mensagem = data.ErrorMessage?.[0] || '';
+            if (mensagem.toLowerCase().includes('page parsing error') || mensagem.toLowerCase().includes('erro')) {
+                return new Response(JSON.stringify({ error: 'Não conseguimos ler a imagem. Verifique se a foto está focada e bem iluminada.' }), {
+                    status: 422,
+                    headers: { 'Content-Type': 'application/json' },
+                });
+            }
+            throw new Error(mensagem || 'Erro ao processar imagem no OCR');
         }
 
         const textoExtraido = data.ParsedResults?.[0]?.ParsedText || '';
 
-        // Extração dinâmica real baseada unicamente no que veio da imagem
+        if (!textoExtraido || textoExtraido.trim().length < 5) {
+            return new Response(JSON.stringify({ error: 'O sistema não detectou texto legível. Tente centralizar melhor o valor total na foto.' }), {
+                status: 422,
+                headers: { 'Content-Type': 'application/json' },
+            });
+        }
+
         const merchantName = limparNomeEstabelecimento(textoExtraido);
         const totalAmount = extrairValorExato(textoExtraido);
         const dataAtual = new Date().toISOString().split('T')[0];
@@ -107,7 +119,7 @@ export default async function handler(req) {
         return new Response(JSON.stringify({
             merchant_name: merchantName,
             date: dataAtual,
-            total_amount: totalAmount > 0 ? totalAmount : 2.00, // Se não achar nada, assume um valor mínimo
+            total_amount: totalAmount > 0 ? totalAmount : 2.00,
             confidence: 0.95,
         }), {
             status: 200,
@@ -115,7 +127,7 @@ export default async function handler(req) {
         });
 
     } catch (error) {
-        return new Response(JSON.stringify({ error: error.message }), {
+        return new Response(JSON.stringify({ error: 'Erro interno no processamento. Tente novamente.' }), {
             status: 500,
             headers: { 'Content-Type': 'application/json' },
         });

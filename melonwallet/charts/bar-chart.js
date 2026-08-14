@@ -1,3 +1,4 @@
+// bar-chart.js
 import { buildBarChartData } from '../utils/finance.util.js';
 
 let barChartInstance = null;
@@ -26,7 +27,8 @@ export function renderBarChart(labels, simulacoes) {
                 legend: { display: false },
                 datalabels: {
                     display: true,
-                    color: (c) => (c.dataset.data[c.dataIndex] >= 0 ? '#c8f5cf' : '#e5a9a6'),
+                    // CORREÇÃO: Define a cor com base no tipo de dataset (entrada/saída)
+                    color: (c) => (c.datasetIndex === 0 ? '#c8f5cf' : '#e5a9a6'), 
                     anchor: 'end',
                     align: 'top',
                     offset: 8,
@@ -35,7 +37,7 @@ export function renderBarChart(labels, simulacoes) {
                         const i = c.dataIndex;
                         if (i === 0) return '';
                         const p = c.chart.data.datasets[c.datasetIndex].data[i - 1];
-                        if (!p) return '';
+                        if (!p || p === 0) return ''; // Evita divisão por zero
                         const d = ((Math.abs(v) - Math.abs(p)) / Math.abs(p)) * 100;
                         return (d >= 0 ? '+' : '') + d.toFixed(0) + '%';
                     },

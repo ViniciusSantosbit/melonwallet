@@ -91,13 +91,53 @@ async function handleDeleteSimulacao(id) {
 }
 
 function editarMeta() {
-    const novoValor = prompt('Nova meta de investimento (R$):', metaValor);
-    if (novoValor && !isNaN(novoValor)) {
-        metaValor = parseFloat(novoValor);
-        setMetaInvestimento(metaValor);
-        const seletor = document.getElementById('filtro-mes-pizza');
-        atualizarInsightsEMetas(seletor.value || '');
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);z-index:9999;';
+
+    const modal = document.createElement('div');
+    modal.style.cssText = 'background:#1c1c1e;padding:20px;border-radius:12px;color:#fff;display:flex;flex-direction:column;gap:10px;min-width:260px;';
+
+    const input = document.createElement('input');
+    input.type = 'number';
+    input.value = metaValor;
+    input.placeholder = 'Nova meta de investimento (R$)';
+    input.style.cssText = 'padding:10px;border-radius:8px;border:1px solid #333;background:#2c2c2e;color:#fff;font-size:16px;';
+
+    const btnConfirmar = document.createElement('button');
+    btnConfirmar.textContent = 'Salvar';
+    btnConfirmar.style.cssText = 'padding:10px;border-radius:8px;border:none;background:#32D74B;color:#000;font-weight:bold;cursor:pointer;';
+
+    const btnCancelar = document.createElement('button');
+    btnCancelar.textContent = 'Cancelar';
+    btnCancelar.style.cssText = 'padding:10px;border-radius:8px;border:none;background:#FF453A;color:#fff;cursor:pointer;';
+
+    modal.appendChild(input);
+    modal.appendChild(btnConfirmar);
+    modal.appendChild(btnCancelar);
+    overlay.appendChild(modal);
+    document.body.appendChild(overlay);
+    input.focus();
+
+    function fecharPromptMeta() {
+        document.body.removeChild(overlay);
     }
+
+    btnConfirmar.addEventListener('click', () => {
+        const novoValor = parseFloat(input.value);
+        if (novoValor && !isNaN(novoValor)) {
+            metaValor = novoValor;
+            setMetaInvestimento(metaValor);
+            const seletor = document.getElementById('filtro-mes-pizza');
+            atualizarInsightsEMetas(seletor.value || '');
+        }
+        fecharPromptMeta();
+    });
+
+    btnCancelar.addEventListener('click', fecharPromptMeta);
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') btnConfirmar.click();
+        if (e.key === 'Escape') btnCancelar.click();
+    });
 }
 
 async function abrirSeletorOCR() {
@@ -122,8 +162,8 @@ function initOcrFileHandler() {
             const novaSimulacaoOCR = {
                 user_id: getUserId(),
                 nome: dados.merchant_name || 'Estabelecimento Escaneado',
-                tipo: 'despesa', // Pode ser que o Supabase espere 'Gasto', 'saida' ou outra palavra
-                valor: parseFloat(dados.total_amount) || 0,
+                tipo: 'saida',
+                valor: -Math.abs(parseFloat(dados.total_amount) || 0),
                 mes_referencia: dados.date ? dados.date.substring(0, 7) + '-01' : new Date().toISOString().substring(0, 7) + '-01',
             };
 

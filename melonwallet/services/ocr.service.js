@@ -1,5 +1,3 @@
-import { enviarImagemOCR } from '../adapters/ocr/mindee.adapter.js';
-
 export async function escanearComprovante(file) {
     if (!file) {
         throw new Error('Nenhuma imagem selecionada');
@@ -11,17 +9,23 @@ export async function escanearComprovante(file) {
     }
 
     try {
-        const dados = await enviarImagemOCR(file);
+        const formData = new FormData();
+        formData.append('document', file);
 
-        if (!dados.merchant_name && !dados.date && !dados.total_amount) {
-            throw new Error('Imagem ilegível ou não é um comprovante válido');
+        const response = await fetch('/api/ocr', {
+            method: 'POST',
+            body: formData,
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || 'Erro ao processar imagem no OCR.');
         }
 
-        return dados;
+        return data;
     } catch (error) {
-        if (error.message.includes('Mindee') || error.message.includes('Erro ao processar')) {
-            throw error;
-        }
-        throw new Error('Erro de conexão. Tente novamente.');
+        console.error("Erro no OCR:", error);
+        throw new Error(error.message || 'Erro de conexão ou processamento. Tente novamente.');
     }
 }

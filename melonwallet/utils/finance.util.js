@@ -3,8 +3,9 @@ import { SIMULACAO_TIPOS } from '../config/constants.js';
 
 function aplicarValorAoSaldo(saldo, simulacao) {
     const valor = parseFloat(simulacao.valor);
-    if (simulacao.tipo === SIMULACAO_TIPOS.SAIDA) return saldo - valor;
-    return saldo + valor;
+    const isSaida = simulacao.tipo === SIMULACAO_TIPOS.SAIDA || simulacao.tipo === 'saida';
+    if (isSaida) return saldo - Math.abs(valor);
+    return saldo + Math.abs(valor);
 }
 
 export function computeBalances(simulacoes) {
@@ -53,8 +54,9 @@ export function aggregateExpensesByName(simulacoes, mesSel) {
 
     simulacoes.forEach((s) => {
         const label = getMonthLabel(s.mes_referencia);
-        if (label === mesSel && s.tipo === SIMULACAO_TIPOS.SAIDA) {
-            gastos[s.nome] = (gastos[s.nome] || 0) + parseFloat(s.valor);
+        const isSaida = s.tipo === SIMULACAO_TIPOS.SAIDA || s.tipo === 'saida';
+        if (label === mesSel && isSaida) {
+            gastos[s.nome] = (gastos[s.nome] || 0) + Math.abs(parseFloat(s.valor));
         }
     });
 
@@ -82,8 +84,9 @@ export function aggregatePieChartData(simulacoes, mes) {
 
     simulacoes.forEach((s) => {
         const label = getMonthLabel(s.mes_referencia);
-        if (label === mes && s.tipo === SIMULACAO_TIPOS.SAIDA) {
-            categorias[s.nome] = (categorias[s.nome] || 0) + parseFloat(s.valor);
+        const isSaida = s.tipo === SIMULACAO_TIPOS.SAIDA || s.tipo === 'saida';
+        if (label === mes && isSaida) {
+            categorias[s.nome] = (categorias[s.nome] || 0) + Math.abs(parseFloat(s.valor));
         }
     });
 
@@ -101,10 +104,12 @@ export function buildBarChartData(labels, simulacoes) {
         const index = labels.indexOf(getMonthLabel(s.mes_referencia));
         if (index === -1) return;
 
-        if (s.tipo === SIMULACAO_TIPOS.SAIDA) {
-            saidas[index] += parseFloat(s.valor) * -1;
+        const isSaida = s.tipo === SIMULACAO_TIPOS.SAIDA || s.tipo === 'saida';
+        const valor = parseFloat(s.valor);
+        if (isSaida) {
+            saidas[index] += -Math.abs(valor);
         } else {
-            entradas[index] += parseFloat(s.valor);
+            entradas[index] += Math.abs(valor);
         }
     });
 

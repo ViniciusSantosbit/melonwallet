@@ -1,3 +1,4 @@
+// table.component.js
 import { SIMULACAO_TIPOS } from '../config/constants.js';
 
 export function renderSimulacoesTable(simulacoes, onDelete) {
@@ -8,12 +9,19 @@ export function renderSimulacoesTable(simulacoes, onDelete) {
 
     [...simulacoes].reverse().slice(0, 8).forEach((s) => {
         const tr = document.createElement('tr');
-        const corValor = s.tipo === SIMULACAO_TIPOS.SAIDA ? '#FF453A' : '#32D74B';
+        
+        const isSaida = s.tipo === 'saida' || s.tipo === 'despesa' || s.tipo === SIMULACAO_TIPOS.SAIDA || parseFloat(s.valor) < 0;
+        const corValor = isSaida ? '#FF453A' : '#32D74B';
+        const tipoExibicao = isSaida ? 'saída' : s.tipo;
+        const valorNumerico = parseFloat(s.valor);
+        const valorExibicao = isSaida
+            ? `-${Math.abs(valorNumerico).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`
+            : valorNumerico.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
 
         tr.innerHTML = `
             <td>${s.nome}</td>
-            <td>${s.tipo}</td>
-            <td style="color: ${corValor}">R$ ${parseFloat(s.valor).toLocaleString('pt-BR')}</td>
+            <td>${tipoExibicao}</td>
+            <td style="color: ${corValor}">R$ ${valorExibicao}</td>
             <td><button data-delete-id="${s.id}" class="btn-delete">🗑️</button></td>
         `;
 
