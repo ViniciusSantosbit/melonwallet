@@ -16,6 +16,8 @@ import { renderGoalProgress, renderTopExpenses } from '../components/goals.compo
 import { renderSimulacoesTable } from '../components/table.component.js';
 import { criarSimulacao, deletarSimulacao, listarSimulacoes } from '../services/simulacoes.service.js';
 import { escanearComprovante } from '../services/ocr.service.js';
+import { categorizarGasto } from '../services/ai.service.js';
+import { initChatWidget } from '../components/chat.component.js';
 import { getUserId, getUserName } from '../storage/session.storage.js';
 import { getMetaInvestimento, setMetaInvestimento } from '../storage/meta.storage.js';
 import { logout, requireAuth } from '../services/session.service.js';
@@ -33,6 +35,7 @@ import { registerServiceWorker } from '../pwa/register-sw.js';
 registerChartPlugins();
 
 let todasSimulacoes = [];
+window.todasSimulacoes = todasSimulacoes;
 let metaValor = getMetaInvestimento();
 
 function atualizarInsightsEMetas(mesSel) {
@@ -59,6 +62,7 @@ async function carregarDados() {
     if (error) return;
 
     todasSimulacoes = sims;
+    window.todasSimulacoes = todasSimulacoes;
 
     const balances = computeBalances(sims);
 
@@ -158,13 +162,16 @@ function initOcrFileHandler() {
 
         try {
             const dados = await escanearComprovante(file);
-            
+
+            const categoria = await categorizarGasto(dados.merchant_name || 'Estabelecimento Escaneado');
+
             const novaSimulacaoOCR = {
                 user_id: getUserId(),
                 nome: dados.merchant_name || 'Estabelecimento Escaneado',
                 tipo: 'saida',
                 valor: -Math.abs(parseFloat(dados.total_amount) || 0),
                 mes_referencia: dados.date ? dados.date.substring(0, 7) + '-01' : new Date().toISOString().substring(0, 7) + '-01',
+                categoria: categoria,
             };
 
             console.log("DADOS ENVIADOS PARA O BANCO:", novaSimulacaoOCR);
@@ -182,6 +189,7 @@ function initOcrFileHandler() {
             alert(
                 `Comprovante escaneado e salvo com sucesso!\n\n` +
                 `Estabelecimento: ${novaSimulacaoOCR.nome}\n` +
+                `Categoria: ${categoria}\n` +
                 `Data: ${dados.date || 'N/A'}\n` +
                 `Valor: R$ ${novaSimulacaoOCR.valor.toFixed(2)}`
             );
@@ -199,12 +207,16 @@ function initSimulacaoForm() {
     formSim.addEventListener('submit', async (e) => {
         e.preventDefault();
 
+        const nome = document.getElementById('sim-nome').value;
+        const categoria = await categorizarGasto(nome || 'Outros');
+
         const novaSim = {
             user_id: getUserId(),
-            nome: document.getElementById('sim-nome').value,
+            nome: nome,
             tipo: document.getElementById('sim-tipo').value,
             valor: parseFloat(document.getElementById('sim-valor').value),
             mes_referencia: document.getElementById('sim-mes').value + '-01',
+            categoria: categoria,
         };
 
         const { error } = await criarSimulacao(novaSim);
@@ -236,6 +248,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     initSimulacaoForm();
     initOcrFileHandler();
+    initChatWidget();
     await carregarDados();
     hideLoader();
 });
