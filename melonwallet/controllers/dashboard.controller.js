@@ -17,6 +17,7 @@ import { renderSimulacoesTable } from '../components/table.component.js';
 import { criarSimulacao, deletarSimulacao, listarSimulacoes } from '../services/simulacoes.service.js';
 import { escanearComprovante } from '../services/ocr.service.js';
 import { categorizarGasto } from '../services/ai.service.js';
+import { initPluggySyncButton } from '../adapters/open-finance/pluggy.adapter.js';
 import { initChatWidget } from '../components/chat.component.js';
 import { getUserId, getUserName } from '../storage/session.storage.js';
 import { getMetaInvestimento, setMetaInvestimento } from '../storage/meta.storage.js';
@@ -233,6 +234,8 @@ function initSimulacaoForm() {
 
 document.addEventListener('DOMContentLoaded', async () => {
     if (!requireAuth()) return;
+
+    initPluggySyncButton();
 
     setGreeting(getUserName());
     setCurrentDate(getLongDateString());
