@@ -15,3 +15,7 @@ export async function criar(simulacao) {
 export async function deletar(id) {
     return supabaseClient.from('simulacoes').delete().eq('id', id);
 }
+
+export async function criarMultiplos(simulacoes) {
+    return supabaseClient.from('simulacoes').insert(simulacoes);
+}

@@ -482,6 +482,19 @@ td { padding: 12px; color: #c9d1d9; white-space: nowrap; }
 .dash-header h1 { font-size: 2.2rem; font-weight: 800; letter-spacing: -1px; }
 .dash-header p { color: #86868b; margin-top: 5px; }
 
+.header-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+    justify-content: center;
+}
+
+.header-actions .btn-add-simulacao,
+.header-actions .btn-scan-receipt {
+    width: 220px;
+}
+
 .btn-add-simulacao {
     background: #fff;
     color: #000;
@@ -495,12 +508,12 @@ td { padding: 12px; color: #c9d1d9; white-space: nowrap; }
 }
 
 .btn-scan-receipt {
-    background: rgba(241, 240, 147, 0.1);
-    color: #f1f09d;
-    border: 1px solid rgba(241, 240, 147, 0.3);
+    background: #e7f0a7;
+    color: #000000;
+    font-weight: bold;
+    border: none;
     padding: 12px 24px;
     border-radius: 12px;
-    font-weight: 600;
     cursor: pointer;
     transition: 0.2s;
     white-space: nowrap;
@@ -510,8 +523,8 @@ td { padding: 12px; color: #c9d1d9; white-space: nowrap; }
 }
 
 .btn-scan-receipt:hover {
-    background: rgba(241, 240, 147, 0.2);
-    border-color: rgba(241, 240, 147, 0.5);
+    background: #dde2bb;
+    transform: translateY(-1px);
 }
 
 .scan-icon {
@@ -562,26 +575,30 @@ td { padding: 12px; color: #c9d1d9; white-space: nowrap; }
 
 /* BOTÃO SINCRONIZAR (OPEN FINANCE / PLUGGY) */
 .btn-sync-bank {
-    background: rgba(50, 215, 75, 0.1);
-    color: #32d74b;
-    border: 1px solid rgba(50, 215, 75, 0.2);
+    background: #a8d83f;
+    color: #ffffff;
+    border: none;
     padding: 5px 12px;
     border-radius: 8px;
     cursor: pointer;
     font-size: 0.8rem;
-    font-weight: 600;
+    font-weight: bold;
     white-space: nowrap;
     transition: 0.2s;
 }
 
 .btn-sync-bank:hover {
-    background: rgba(50, 215, 75, 0.2);
-    border-color: rgba(50, 215, 75, 0.5);
+    background: #92c233;
+    transform: translateY(-1px);
 }
 
 .btn-sync-bank:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+}
+
+.hidden {
+    display: none !important;
 }
 
 /* NAVBAR DASHBOARD */
@@ -597,14 +614,108 @@ td { padding: 12px; color: #c9d1d9; white-space: nowrap; }
     white-space: nowrap;
 }
 
+.bank-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(50, 215, 75, 0.1);
+    color: #32D74B;
+    border: 1px solid rgba(50, 215, 75, 0.25);
+    padding: 5px 12px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    opacity: 0;
+    transform: translateY(-4px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    pointer-events: none;
+}
+
+.bank-status.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.bank-status-wrapper {
+    position: relative;
+}
+
+.bank-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 8px;
+    background: rgba(18, 18, 18, 0.98);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 8px;
+    min-width: 180px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-4px);
+    transition: all 0.2s ease;
+    z-index: 1100;
+}
+
+.bank-status-wrapper:hover .bank-dropdown,
+.bank-dropdown.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.bank-dropdown-item {
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: #fff;
+    padding: 10px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    text-align: left;
+    transition: background 0.2s;
+}
+
+.bank-dropdown-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+/* Scroll horizontal para gráfico de barras com muitos meses */
+.chart-container-scroll {
+    overflow-x: auto;
+    overflow-y: hidden;
+    max-width: 100%;
+    height: 280px;
+}
+
+.chart-container-scroll .chart-box {
+    min-width: 600px;
+}
+
 /* TABELA */
 .table-scroll {
     overflow-x: auto;
+    overflow-y: auto;
+    max-height: 350px;
     -webkit-overflow-scrolling: touch;
 }
 
 .table-scroll::-webkit-scrollbar { height: 4px; width: 4px; }
 .table-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+.table-scroll::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); }
+
+/* Scrollbar global escura */
+::-webkit-scrollbar { height: 4px; width: 4px; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+
+#simulacoes-table td:first-child {
+    max-width: 150px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 
 /* MODAL */
 .modal-overlay {
@@ -782,7 +893,9 @@ input[list]:focus { border-color: rgba(253,253,150,0.5); background: rgba(255,25
     /* Dashboard header */
     .dash-header { flex-direction: column; align-items: flex-start; gap: 16px; margin-bottom: 24px; }
     .dash-header h1 { font-size: 1.8rem; }
-    .btn-add-simulacao { width: 100%; text-align: center; padding: 13px; }
+    .header-actions { width: 100%; }
+    .btn-add-simulacao,
+    .btn-scan-receipt { width: 100%; text-align: center; padding: 13px; }
 
     /* Métricas */
     .metrics-grid { grid-template-columns: 1fr; gap: 12px; margin-bottom: 16px; }

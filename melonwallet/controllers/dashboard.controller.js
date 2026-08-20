@@ -17,7 +17,7 @@ import { renderSimulacoesTable } from '../components/table.component.js';
 import { criarSimulacao, deletarSimulacao, listarSimulacoes } from '../services/simulacoes.service.js';
 import { escanearComprovante } from '../services/ocr.service.js';
 import { categorizarGasto } from '../services/ai.service.js';
-import { initPluggySyncButton } from '../adapters/open-finance/pluggy.adapter.js';
+import { initPluggySyncButton, sincronizarBanco } from '../adapters/open-finance/pluggy.adapter.js';
 import { initChatWidget } from '../components/chat.component.js';
 import { getUserId, getUserName } from '../storage/session.storage.js';
 import { getMetaInvestimento, setMetaInvestimento } from '../storage/meta.storage.js';
@@ -30,7 +30,7 @@ import {
     computeTotalInvestments,
     getTopExpenses,
 } from '../utils/finance.util.js';
-import { getCurrentMonthInput, getLongDateString } from '../utils/dates.util.js';
+import { getCurrentMonthInput, getLongDateString, getMonthLabel } from '../utils/dates.util.js';
 import { registerServiceWorker } from '../pwa/register-sw.js';
 
 registerChartPlugins();
@@ -49,6 +49,21 @@ function atualizarInsightsEMetas(mesSel) {
 
     renderGoalProgress({ progresso, investTotal, metaValor });
     renderTopExpenses(topGastos);
+}
+
+function atualizarTabelaPorMes(mesSel) {
+    let transacoesFiltradas = todasSimulacoes;
+    if (mesSel) {
+        transacoesFiltradas = todasSimulacoes.filter((s) => getMonthLabel(s.mes_referencia) === mesSel);
+    }
+
+    const transacoesOrdenadas = [...transacoesFiltradas].sort((a, b) => {
+        const dataA = new Date(a.data_transacao || a.data_efetivacao || a.created_at || a.mes_referencia || 0);
+        const dataB = new Date(b.data_transacao || b.data_efetivacao || b.created_at || b.mes_referencia || 0);
+        return dataB - dataA;
+    }).slice(0, 8);
+
+    renderSimulacoesTable(transacoesOrdenadas, handleDeleteSimulacao);
 }
 
 function atualizarPizzaPorMes(mes) {
@@ -77,16 +92,43 @@ async function carregarDados() {
     });
 
     const seletor = populateMonthSelector(balances.mesesComDados);
+    let mesInicial = '';
 
     if (balances.mesesComDados.length > 0) {
-        const ultimo = balances.mesesComDados[balances.mesesComDados.length - 1];
-        seletor.value = ultimo;
-        atualizarPizzaPorMes(ultimo);
-        atualizarInsightsEMetas(ultimo);
+        mesInicial = balances.mesesComDados[balances.mesesComDados.length - 1];
+        seletor.value = mesInicial;
+        atualizarPizzaPorMes(mesInicial);
+        atualizarInsightsEMetas(mesInicial);
     }
 
     renderBarChart(balances.mesesComDados, sims);
-    renderSimulacoesTable(sims, handleDeleteSimulacao);
+
+    setTimeout(() => {
+        const container = document.querySelector('.chart-container-scroll');
+        if (container) {
+            container.scrollLeft = container.scrollWidth;
+        }
+    }, 50);
+
+    atualizarTabelaPorMes(mesInicial);
+
+    const bankStatus = document.getElementById('bank-status');
+    const btnSyncBank = document.getElementById('btn-sync-bank');
+    const bankStatusWrapper = document.getElementById('bank-status-wrapper');
+
+    if (bankStatus && btnSyncBank && bankStatusWrapper) {
+        if (sims.length > 0) {
+            btnSyncBank.classList.add('hidden');
+            bankStatusWrapper.classList.remove('hidden');
+            bankStatus.style.display = 'inline-flex';
+            requestAnimationFrame(() => bankStatus.classList.add('visible'));
+        } else {
+            btnSyncBank.classList.remove('hidden');
+            bankStatusWrapper.classList.add('hidden');
+            bankStatus.classList.remove('visible');
+            setTimeout(() => { bankStatus.style.display = 'none'; }, 400);
+        }
+    }
 }
 
 async function handleDeleteSimulacao(id) {
@@ -235,7 +277,14 @@ function initSimulacaoForm() {
 document.addEventListener('DOMContentLoaded', async () => {
     if (!requireAuth()) return;
 
-    initPluggySyncButton();
+    initPluggySyncButton(carregarDados);
+
+    const btnChangeBank = document.getElementById('btn-change-bank');
+    if (btnChangeBank) {
+        btnChangeBank.addEventListener('click', async () => {
+            await sincronizarBanco(carregarDados);
+        });
+    }
 
     setGreeting(getUserName());
     setCurrentDate(getLongDateString());
@@ -246,6 +295,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         seletor.addEventListener('change', (e) => {
             atualizarPizzaPorMes(e.target.value);
             atualizarInsightsEMetas(e.target.value);
+            atualizarTabelaPorMes(e.target.value);
         });
     }
 

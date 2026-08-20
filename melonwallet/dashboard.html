@@ -44,6 +44,12 @@
             <div class="nav-user-info">
                 <span id="user-greeting">Olá...</span>
                 <button id="btn-sync-bank" class="btn-sync-bank">Sincronizar</button>
+                <div id="bank-status-wrapper" class="bank-status-wrapper hidden">
+                    <span id="bank-status" class="bank-status">🏦 Conta Conectada</span>
+                    <div class="bank-dropdown">
+                        <button id="btn-change-bank" class="bank-dropdown-item">Trocar de Banco</button>
+                    </div>
+                </div>
                 <button class="nav-btn-logout" onclick="logout()">Sair</button>
             </div>
         </div>
@@ -56,10 +62,12 @@
                 <h1>Visão Geral:</h1>
                 <p>Gerencie seu patrimônio com a inteligência do Melão.</p>
             </div>
-            <button class="btn-add-simulacao" onclick="abrirModal()">+ Nova Simulação</button>
-            <button class="btn-scan-receipt" onclick="abrirSeletorOCR()">
-                <span class="scan-icon">📷</span> Escanear Comprovante
-            </button>
+            <div class="header-actions">
+                <button class="btn-add-simulacao" onclick="abrirModal()">+ Nova Simulação</button>
+                <button class="btn-scan-receipt" onclick="abrirSeletorOCR()">
+                    <span class="scan-icon">📷</span> Escanear Comprovante
+                </button>
+            </div>
             <input type="file" id="ocr-file-input" accept="image/*,application/pdf" capture="environment" style="display: none;">
         </header>
 
@@ -69,7 +77,7 @@
                     <span>Saldo:</span>
                     <select id="seletor-tipo-saldo" onchange="alternarVisualizacaoSaldo()" class="saldo-selector">
                         <option value="total">Total Acumulado</option>
-                        <option value="mes">Apenas este Mês</option>
+                        <option value="mes" selected>Apenas este Mês</option>
                     </select>
                 </div>
                 <h2 id="total-saldo">R$ 0,00</h2>
@@ -99,7 +107,9 @@
                 </div>
                 <!-- CORREÇÃO PRINCIPAL: inline style removido, classe no lugar -->
                 <div class="charts-container-split">
-                    <div class="chart-box"><canvas id="patrimonioChart"></canvas></div>
+                    <div class="chart-container-scroll">
+                        <div class="chart-box"><canvas id="patrimonioChart"></canvas></div>
+                    </div>
                     <div class="chart-box"><canvas id="pizzaChart"></canvas></div>
                 </div>
             </div>

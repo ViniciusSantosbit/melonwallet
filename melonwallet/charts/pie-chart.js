@@ -2,8 +2,9 @@ let pieChartInstance = null;
 
 const PIE_COLORS = [
     '#efeb03', '#c26f03', '#32D74B', '#9370DB', '#ee170c', '#f099b3',
-    '#0000ff', '#ccc3c3', '#20b2aa', '#008080', '#BDB76B', '#F5DEB3',
-    '#FA8072', '#2F4F4F', '#D8BFD8',
+    '#00ff87', '#ff6b6b', '#4ecdc4', '#ffe66d', '#a29bfe', '#fd79a8',
+    '#00cec9', '#e17055', '#0984e3', '#fdcb6e', '#6c5ce7', '#00b894',
+    '#e84393', '#f39c12',
 ];
 
 export function renderPieChart(labels, valores) {

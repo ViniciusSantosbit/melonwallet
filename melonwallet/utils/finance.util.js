@@ -1,5 +1,26 @@
-import { getMonthLabel, getCurrentMonthLabel, getPreviousMonthLabel } from './dates.util.js';
+import { getMonthLabel, getPreviousMonthLabel } from './dates.util.js';
 import { SIMULACAO_TIPOS } from '../config/constants.js';
+
+function cleanNome(nome) {
+    if (!nome) return '';
+    let limpo = nome;
+    if (limpo.includes('|')) {
+        limpo = limpo.split('|').pop().trim();
+    }
+    limpo = limpo
+        .replace(/Compra no débito/gi, '')
+        .replace(/Transferência enviada/gi, '')
+        .replace(/Transferência Recebida/gi, '')
+        .replace(/Pelo Pix/gi, '')
+        .replace(/Pix/gi, '')
+        .trim();
+
+    if (limpo.length > 0) {
+        limpo = limpo.charAt(0).toUpperCase() + limpo.slice(1);
+    }
+
+    return limpo || 'Outros';
+}
 
 function aplicarValorAoSaldo(saldo, simulacao) {
     const valor = parseFloat(simulacao.valor);
@@ -12,23 +33,29 @@ export function computeBalances(simulacoes) {
     let saldoTotal = 0;
     let saldoMesAtual = 0;
     let saldoAnt = 0;
-    const mesesComDados = new Set();
+    const mesesReferencia = new Set();
 
-    const labelMesAtual = getCurrentMonthLabel();
     const labelAnt = getPreviousMonthLabel();
 
     simulacoes.forEach((s) => {
         const label = getMonthLabel(s.mes_referencia);
         saldoTotal = aplicarValorAoSaldo(saldoTotal, s);
 
-        if (label === labelMesAtual) {
+        const txDate = new Date(s.mes_referencia);
+        const hoje = new Date();
+        if (txDate.getMonth() === hoje.getMonth() && txDate.getFullYear() === hoje.getFullYear()) {
             saldoMesAtual = aplicarValorAoSaldo(saldoMesAtual, s);
         }
+
         if (label === labelAnt) {
             saldoAnt = aplicarValorAoSaldo(saldoAnt, s);
         }
-        mesesComDados.add(label);
+        mesesReferencia.add(s.mes_referencia);
     });
+
+    const mesesComDados = Array.from(mesesReferencia)
+        .sort((a, b) => a.localeCompare(b))
+        .map((m) => getMonthLabel(m));
 
     let tendenciaCalculada = '';
     let corTendenciaCalculada = '';
@@ -43,7 +70,7 @@ export function computeBalances(simulacoes) {
         saldoTotal,
         saldoMesAtual,
         saldoAnt,
-        mesesComDados: Array.from(mesesComDados),
+        mesesComDados,
         tendenciaCalculada,
         corTendenciaCalculada,
     };
@@ -56,7 +83,8 @@ export function aggregateExpensesByName(simulacoes, mesSel) {
         const label = getMonthLabel(s.mes_referencia);
         const isSaida = s.tipo === SIMULACAO_TIPOS.SAIDA || s.tipo === 'saida';
         if (label === mesSel && isSaida) {
-            gastos[s.nome] = (gastos[s.nome] || 0) + Math.abs(parseFloat(s.valor));
+            const nomeLimpo = cleanNome(s.nome);
+            gastos[nomeLimpo] = (gastos[nomeLimpo] || 0) + Math.abs(parseFloat(s.valor));
         }
     });
 
@@ -86,7 +114,8 @@ export function aggregatePieChartData(simulacoes, mes) {
         const label = getMonthLabel(s.mes_referencia);
         const isSaida = s.tipo === SIMULACAO_TIPOS.SAIDA || s.tipo === 'saida';
         if (label === mes && isSaida) {
-            categorias[s.nome] = (categorias[s.nome] || 0) + Math.abs(parseFloat(s.valor));
+            const nomeLimpo = cleanNome(s.nome);
+            categorias[nomeLimpo] = (categorias[nomeLimpo] || 0) + Math.abs(parseFloat(s.valor));
         }
     });
 

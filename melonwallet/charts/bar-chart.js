@@ -7,6 +7,11 @@ export function renderBarChart(labels, simulacoes) {
     const ctx = document.getElementById('patrimonioChart').getContext('2d');
     if (barChartInstance) barChartInstance.destroy();
 
+    if (labels.length > 5) {
+        const canvas = document.getElementById('patrimonioChart');
+        canvas.style.width = (labels.length * 110) + 'px';
+    }
+
     const { entradas, saidas } = buildBarChartData(labels, simulacoes);
 
     barChartInstance = new Chart(ctx, {
@@ -15,8 +20,8 @@ export function renderBarChart(labels, simulacoes) {
         data: {
             labels,
             datasets: [
-                { label: 'Entradas', data: entradas, backgroundColor: '#f1f09d', borderRadius: 6 },
-                { label: 'Saídas', data: saidas, backgroundColor: '#c26f03', borderRadius: 6 },
+                { label: 'Entradas', data: entradas, backgroundColor: '#f1f09d', barPercentage: 0.95, categoryPercentage: 1.0 },
+                { label: 'Saídas', data: saidas, backgroundColor: '#c26f03', barPercentage: 0.95, categoryPercentage: 1.0 },
             ],
         },
         options: {
@@ -32,7 +37,7 @@ export function renderBarChart(labels, simulacoes) {
                     anchor: 'end',
                     align: 'top',
                     offset: 8,
-                    font: { weight: 'bold' },
+                    font: { size: 9, weight: 'bold' },
                     formatter: (v, c) => {
                         const i = c.dataIndex;
                         if (i === 0) return '';
@@ -45,7 +50,7 @@ export function renderBarChart(labels, simulacoes) {
             },
             scales: {
                 y: {
-                    grid: { color: 'rgba(255,255,255,0.05)' },
+                    grid: { display: false },
                     ticks: { color: '#86868b' },
                     grace: '20%',
                 },
