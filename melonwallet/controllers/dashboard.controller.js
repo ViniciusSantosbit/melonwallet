@@ -58,8 +58,8 @@ function atualizarTabelaPorMes(mesSel) {
     }
 
     const transacoesOrdenadas = [...transacoesFiltradas].sort((a, b) => {
-        const dataA = new Date(a.data_transacao || a.data_efetivacao || a.created_at || a.mes_referencia || 0);
-        const dataB = new Date(b.data_transacao || b.data_efetivacao || b.created_at || b.mes_referencia || 0);
+        const dataA = new Date(a.created_at || a.data || a.data_efetivacao || a.mes_referencia || 0);
+        const dataB = new Date(b.created_at || b.data || b.data_efetivacao || b.mes_referencia || 0);
         return dataB - dataA;
     }).slice(0, 8);
 
@@ -129,6 +129,47 @@ async function carregarDados() {
             setTimeout(() => { bankStatus.style.display = 'none'; }, 400);
         }
     }
+}
+
+// Re-renderiza o dashboard inteiro a partir do array em memória (sem chamar o banco).
+// Usado na UI otimista para a tela reagir na mesma fração de segundo.
+function atualizarDashboard() {
+    const sims = todasSimulacoes;
+    const balances = computeBalances(sims);
+
+    updateMetrics({
+        saldoGlobal: balances.saldoTotal,
+        saldoMesAtual: balances.saldoMesAtual,
+        tendencia: balances.tendenciaCalculada,
+        corTendencia: balances.corTendenciaCalculada,
+        totalSimulacoes: sims.length,
+        lucroPrevisto: balances.saldoTotal * 0.01,
+    });
+
+    const seletorAnterior = document.getElementById('filtro-mes-pizza')?.value || '';
+    const seletor = populateMonthSelector(balances.mesesComDados);
+
+    let mesSelecionado = seletorAnterior;
+    if (!balances.mesesComDados.includes(mesSelecionado)) {
+        mesSelecionado = balances.mesesComDados.length > 0 ? balances.mesesComDados[balances.mesesComDados.length - 1] : '';
+    }
+    seletor.value = mesSelecionado;
+
+    if (balances.mesesComDados.length > 0) {
+        atualizarPizzaPorMes(mesSelecionado);
+        atualizarInsightsEMetas(mesSelecionado);
+    }
+
+    renderBarChart(balances.mesesComDados, sims);
+
+    setTimeout(() => {
+        const container = document.querySelector('.chart-container-scroll');
+        if (container) {
+            container.scrollLeft = container.scrollWidth;
+        }
+    }, 50);
+
+    atualizarTabelaPorMes(mesSelecionado);
 }
 
 async function handleDeleteSimulacao(id) {
@@ -251,25 +292,73 @@ function initSimulacaoForm() {
         e.preventDefault();
 
         const nome = document.getElementById('sim-nome').value;
-        const categoria = await categorizarGasto(nome || 'Outros');
 
-        const novaSim = {
-            user_id: getUserId(),
-            nome: nome,
+        // 1. Monta o objeto bruto do formulário
+        const novaTransacao = {
+            descricao: nome,
             tipo: document.getElementById('sim-tipo').value,
             valor: parseFloat(document.getElementById('sim-valor').value),
-            mes_referencia: document.getElementById('sim-mes').value + '-01',
-            categoria: categoria,
+            data: document.getElementById('dataSimulacao').value,
+            categoria: 'Outros',
         };
 
-        const { error } = await criarSimulacao(novaSim);
+        // Payload com match exato nas colunas reais do Supabase
+        const dataInsercao = new Date(novaTransacao.data);
+        const mesReferenciaFormatado = `${dataInsercao.getFullYear()}-${String(dataInsercao.getMonth() + 1).padStart(2, '0')}-01`;
 
-        if (error) {
-            alert('Erro ao salvar: ' + error.message);
-        } else {
-            fecharModal();
-            formSim.reset();
-            await carregarDados();
+        const payload = {
+            nome: novaTransacao.descricao,
+            tipo: novaTransacao.tipo,
+            valor: novaTransacao.valor,
+            created_at: novaTransacao.data,
+            mes_referencia: mesReferenciaFormatado,
+            origem: 'manual',
+            status: 'Ativo'
+        };
+
+        // 2. UI Otimista: insere no array local COM O MESMO FORMATO DO BANCO (evita undefined/Invalid Date)
+        const transacaoOtimista = {
+            id: 'temp-' + Date.now(),
+            nome: payload.nome,
+            tipo: payload.tipo,
+            valor: payload.valor,
+            created_at: payload.created_at,
+            mes_referencia: payload.mes_referencia,
+            origem: payload.origem,
+            status: payload.status,
+            categoria: novaTransacao.categoria,
+        };
+
+        todasSimulacoes.unshift(transacaoOtimista);
+        window.todasSimulacoes = todasSimulacoes;
+        atualizarDashboard();
+        fecharModal();
+        formSim.reset();
+
+        // 3. Persistência no Supabase (após a UI já estar atualizada -> não trava a tela).
+        //    O Supabase resolve a promise com { data, error } mesmo em erro de banco, por isso checamos o `error`.
+        try {
+            const categoria = await categorizarGasto(nome || 'Outros');
+            transacaoOtimista.categoria = categoria;
+            atualizarDashboard(); // reflete a categoria correta no gráfico de pizza/insights
+
+            const { data, error } = await criarSimulacao(payload);
+
+            if (error) {
+                console.error('Erro do Supabase:', error);
+                throw error;
+            }
+
+            // Reconcilia o id retornado para que a exclusão futura funcione
+            const inserido = Array.isArray(data) && data[0] ? data[0] : null;
+            if (inserido && inserido.id) transacaoOtimista.id = inserido.id;
+        } catch (err) {
+            console.error('Erro ao salvar simulação no banco:', err);
+            alert('Erro ao salvar simulação no banco: ' + (err && err.message ? err.message : err));
+            const idx = todasSimulacoes.indexOf(transacaoOtimista);
+            if (idx > -1) todasSimulacoes.splice(idx, 1);
+            window.todasSimulacoes = todasSimulacoes;
+            atualizarDashboard();
         }
     });
 }

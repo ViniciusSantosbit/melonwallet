@@ -38,6 +38,26 @@ function injectStyles() {
             box-shadow: 0 10px 30px rgba(241, 240, 147, 0.5);
         }
 
+        .ia-btn-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            gap: 1px;
+        }
+
+        .ant-icon {
+            font-size: 22px;
+        }
+
+        .ia-text {
+            font-size: 0.6rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            margin-top: 1px;
+        }
+
         #ai-chat-panel {
             display: none;
             position: absolute;
@@ -215,7 +235,12 @@ function createWidget() {
                 <button class="ai-chat-send" id="ai-chat-send">Enviar</button>
             </div>
         </div>
-        <button id="ai-chat-toggle">💬</button>
+        <button id="ai-chat-toggle">
+            <div class="ia-btn-content">
+                <span class="ant-icon">🐜</span>
+                <span class="ia-text">IA</span>
+            </div>
+        </button>
     `;
     document.body.appendChild(widget);
 

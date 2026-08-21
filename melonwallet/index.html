@@ -92,9 +92,6 @@
                     <li><span class="feat-icon">🔒</span> Sessão salva com segurança</li>
                     <li><span class="feat-icon">📱</span> Tela cheia, sem barra do navegador</li>
                 </ul>
-                <button class="btn-main app-promo-btn" onclick="window.scrollTo({top:0,behavior:'smooth'})">
-                    Instalar agora — é grátis
-                </button>
             </div>
 
             <!-- CELULAR DIREITO — imagem real -->
@@ -190,6 +187,7 @@
         <div class="final-cta reveal">
             <h2>Pronto para transformar sua gestão?</h2>
             <button class="btn-main" onclick="mostrarCadastro()" style="max-width: 320px; margin: 0 auto;">Começar agora gratuitamente</button>
+            <button id="btn-baixar-app" class="btn-main btn-white" style="max-width: 320px; margin: 15px auto 0; display: block;">Baixar agora</button>
         </div>
     </section>
 
@@ -205,19 +203,6 @@
             </div>
         </div>
     </footer>
-
-    <!-- PWA: Banner de Instalação -->
-    <div id="pwa-install-banner" style="display:none;">
-        <div class="pwa-banner-content">
-            <span class="pwa-banner-icon">🍈</span>
-            <div class="pwa-banner-text">
-                <strong>Instalar Melon Wallet</strong>
-                <span>Acesso rápido, funciona offline</span>
-            </div>
-            <button id="pwa-btn-install" class="pwa-btn-confirm">Instalar</button>
-            <button id="pwa-btn-close" class="pwa-btn-dismiss" aria-label="Fechar">✕</button>
-        </div>
-    </div>
 
     <!-- PWA: Modal iOS -->
     <div id="ios-install-modal" style="display:none;">

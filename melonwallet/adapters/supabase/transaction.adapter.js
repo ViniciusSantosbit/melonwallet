@@ -9,7 +9,7 @@ export async function listar(userId) {
 }
 
 export async function criar(simulacao) {
-    return supabaseClient.from('simulacoes').insert([simulacao]);
+    return supabaseClient.from('simulacoes').insert([simulacao]).select();
 }
 
 export async function deletar(id) {

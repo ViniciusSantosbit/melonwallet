@@ -8,8 +8,8 @@ export function renderSimulacoesTable(simulacoes, onDelete) {
     tbody.innerHTML = '';
 
     const transacoesOrdenadas = [...simulacoes].sort((a, b) => {
-        const dataA = new Date(a.data_transacao || a.data_efetivacao || a.created_at || a.mes_referencia || 0);
-        const dataB = new Date(b.data_transacao || b.data_efetivacao || b.created_at || b.mes_referencia || 0);
+        const dataA = new Date(a.created_at || a.data || a.data_efetivacao || a.mes_referencia || 0);
+        const dataB = new Date(b.created_at || b.data || b.data_efetivacao || b.mes_referencia || 0);
         return dataB - dataA;
     }).slice(0, 8);
 
@@ -24,7 +24,7 @@ export function renderSimulacoesTable(simulacoes, onDelete) {
             ? `-${Math.abs(valorNumerico).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`
             : valorNumerico.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
 
-        const dataRaw = s.data_transacao || s.data_efetivacao || s.created_at || s.mes_referencia;
+        const dataRaw = s.created_at || s.data || s.data_efetivacao || s.mes_referencia;
         let dataFormatada = '';
         if (dataRaw) {
             const data = new Date(dataRaw);

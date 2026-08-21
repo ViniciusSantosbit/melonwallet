@@ -100,7 +100,7 @@ function normalizarTransacaoPluggy(transacao, userId, contaId) {
         mes_referencia: mesReferencia,
         categoria,
         conta_id: contaId,
-        data_transacao: dataTransacaoOriginal,
+        data: dataTransacaoOriginal,
     };
 }
 

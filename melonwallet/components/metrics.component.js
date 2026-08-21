@@ -20,6 +20,15 @@ export function updateMetrics({
         corTendenciaCalculada,
     };
 
+    // Injeta o Saldo (mês atual ou total, conforme o seletor) formatado em BRL no elemento HTML
+    const campoSaldo = document.getElementById('total-saldo');
+    if (campoSaldo) {
+        const seletorSaldo = document.getElementById('seletor-tipo-saldo');
+        const tipoSaldo = seletorSaldo ? seletorSaldo.value : 'mes';
+        const valorSaldo = tipoSaldo === 'mes' ? (saldoMesAtual || 0) : (saldoGlobal || 0);
+        campoSaldo.innerText = valorSaldo.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+
     document.getElementById('total-lucro').innerText = `R$ ${formatBRL(lucroPrevisto)}`;
     document.getElementById('total-ativos').innerText = totalSimulacoes;
 

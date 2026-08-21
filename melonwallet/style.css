@@ -18,6 +18,7 @@ body {
     overflow-x: hidden;
     position: relative;
     min-height: 100vh;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 body::before {
@@ -48,6 +49,7 @@ body::before {
     z-index: 1000;
     display: flex;
     justify-content: center;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
 .nav-content {
@@ -201,6 +203,17 @@ input:focus {
     transform: translateY(-1px);
 }
 
+.btn-white {
+    background-color: #ffffff !important;
+    color: #1a1a1a !important;
+    border: 1px solid #e0e0e0;
+}
+
+.btn-white:hover {
+    background-color: #f5f5f5 !important;
+    transform: scale(1.02);
+}
+
 .link-alternativo { margin-top: 24px; font-size: 0.9rem; color: #86868b; }
 .link-alternativo a { color: #FFD700; text-decoration: none; font-weight: 600; }
 .link-alternativo a:hover { text-decoration: underline; }
@@ -309,7 +322,6 @@ input:focus {
 }
 
 .feat-icon { font-size: 1.1rem; width: 28px; text-align: center; flex-shrink: 0; }
-.app-promo-btn { max-width: 280px; font-size: 1rem; }
 
 /* CELULAR — imagem real phone.png */
 .app-promo-phone {
@@ -569,6 +581,7 @@ td { padding: 12px; color: #c9d1d9; white-space: nowrap; }
     /* impede overflow do canvas */
     min-width: 0;
     overflow: hidden;
+    transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .glass-card-dash h3 { font-size: 1.1rem; margin-bottom: 20px; color: #f5f5f7; }
@@ -832,19 +845,6 @@ input[list]:focus { border-color: rgba(253,253,150,0.5); background: rgba(255,25
 .expense-insight-card b { color: #fff; font-size: 1.3rem; font-family: monospace; }
 .btn-edit-goal { background: rgba(255,255,255,0.05); border: none; color: #86868b; cursor: pointer; font-size: 0.7rem; padding: 4px 10px; border-radius: 6px; }
 
-/* ─── PWA BANNER ─── */
-#pwa-install-banner { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); width: calc(100% - 40px); max-width: 480px; z-index: 8000; animation: pwaSlideUp 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
-@keyframes pwaSlideUp { from { opacity: 0; transform: translateX(-50%) translateY(30px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
-.pwa-banner-content { display: flex; align-items: center; gap: 12px; background: rgba(18,18,18,0.97); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); border: 1px solid rgba(241,240,147,0.25); border-radius: 20px; padding: 14px 18px; box-shadow: 0 8px 40px rgba(0,0,0,0.6); }
-.pwa-banner-icon { font-size: 2rem; flex-shrink: 0; }
-.pwa-banner-text { flex: 1; display: flex; flex-direction: column; gap: 2px; text-align: left; }
-.pwa-banner-text strong { font-size: 0.9rem; color: #f5f5f7; font-weight: 600; }
-.pwa-banner-text span { font-size: 0.75rem; color: #86868b; }
-.pwa-btn-confirm { background: #f1f193; color: #000; border: none; padding: 8px 18px; border-radius: 12px; font-size: 0.85rem; font-weight: 700; cursor: pointer; white-space: nowrap; transition: transform 0.2s, background 0.2s; flex-shrink: 0; }
-.pwa-btn-confirm:hover { background: #ffdb1a; transform: scale(1.04); }
-.pwa-btn-dismiss { background: transparent; border: none; color: #484f58; font-size: 1rem; cursor: pointer; padding: 4px 6px; border-radius: 8px; transition: color 0.2s; flex-shrink: 0; }
-.pwa-btn-dismiss:hover { color: #fff; }
-
 /* ─── PWA MODAL iOS ─── */
 #ios-install-modal { position: fixed; inset: 0; z-index: 8999; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 20px; }
 .ios-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(10px); z-index: 8998; }
@@ -887,7 +887,6 @@ input[list]:focus { border-color: rgba(253,253,150,0.5); background: rgba(255,25
     .app-promo-title { font-size: 2.6rem; }
     .app-promo-desc { max-width: 100%; }
     .app-promo-features { align-items: flex-start; text-align: left; }
-    .app-promo-btn { margin: 0 auto; }
     .phone-real-img { width: 240px; }
 
     /* Dashboard header */
@@ -954,7 +953,6 @@ input[list]:focus { border-color: rgba(253,253,150,0.5); background: rgba(255,25
     .modal-card { width: calc(100vw - 32px); padding: 28px 20px; border-radius: 20px; }
 
     /* PWA */
-    #pwa-install-banner { bottom: 16px; width: calc(100% - 24px); }
     .pwa-banner-content { padding: 12px 14px; gap: 10px; }
     .pwa-btn-confirm { padding: 8px 12px; font-size: 0.8rem; }
 }
@@ -1002,3 +1000,116 @@ input[list]:focus { border-color: rgba(253,253,150,0.5); background: rgba(255,25
     .expense-insight-card b { font-size: 1rem; }
     .glass-card { padding: 28px 14px; }
 }
+
+/* --- MELON LIGHT MODE (TOGGLE SOL/LUA) --- */
+.btn-theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.06);
+    color: #fff;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s;
+}
+
+.btn-theme-toggle:hover {
+    transform: translateY(-1px);
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.btn-theme-toggle svg {
+    width: 18px;
+    height: 18px;
+}
+
+.btn-theme-toggle .icon-moon { display: none; }
+
+body.light-melon-mode {
+    background-color: #fdfcf0;
+    color: #1a1a1a;
+}
+
+/* Esconde o fundo escuro (fundo.png) e aplica o pastel claro */
+body.light-melon-mode::before {
+    background-image: none;
+    filter: none;
+    background-color: #fdfcf0;
+}
+
+body.light-melon-mode .navbar {
+    background: #f9f2c6;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+body.light-melon-mode .nav-brand-text,
+body.light-melon-mode .nav-user-info,
+body.light-melon-mode #user-greeting {
+    color: #1a1a1a;
+}
+
+/* Logo preta automática no modo claro */
+body.light-melon-mode .nav-logo img { filter: brightness(0); }
+
+body.light-melon-mode .glass-card-dash,
+body.light-melon-mode .metric-card {
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+
+body.light-melon-mode .glass-card-dash h3,
+body.light-melon-mode .metric-card h2,
+body.light-melon-mode .metric-card span,
+body.light-melon-mode .dash-header h1,
+body.light-melon-mode .dash-header p,
+body.light-melon-mode #current-date {
+    color: #1a1a1a;
+}
+
+body.light-melon-mode .mini-trend { color: #555; }
+
+/* Tabela "Últimas Movimentações" legível no modo claro (mantém cor do valor verde/vermelho) */
+body.light-melon-mode #simulacoes-table th,
+body.light-melon-mode #simulacoes-table tbody td:not(:nth-child(3)),
+body.light-melon-mode #simulacoes-table tbody td div { color: #1a1a1a !important; }
+
+/* Curiosidades: Maiores Gastos do Mês (títulos e valores R$) legíveis no modo claro */
+body.light-melon-mode .expense-insight-card {
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+body.light-melon-mode .expense-insight-card span,
+body.light-melon-mode .expense-insight-card b,
+body.light-melon-mode .top-expenses-grid p { color: #1a1a1a !important; }
+
+/* Porcentagem do Objetivo de Investimento com contraste no modo claro */
+body.light-melon-mode .goal-percent-box span { color: #c29b00 !important; }
+
+/* Botões com mostarda/amelo escuro para contraste */
+body.light-melon-mode .btn-add-simulacao {
+    background: #f5c518;
+    color: #1a1a1a;
+}
+
+body.light-melon-mode .btn-theme-toggle {
+    background: #f5c518;
+    color: #1a1a1a;
+    border-color: rgba(0, 0, 0, 0.15);
+}
+
+body.light-melon-mode .btn-theme-toggle .icon-sun { display: none; }
+body.light-melon-mode .btn-theme-toggle .icon-moon { display: block; }
+
+/* Scrollbar visível no White Mode (Melon Mode) */
+.light-melon-mode .chart-container-scroll::-webkit-scrollbar { height: 8px; }
+.light-melon-mode .chart-container-scroll::-webkit-scrollbar-track { background: #fdfcf0; border-radius: 4px; }
+.light-melon-mode .chart-container-scroll::-webkit-scrollbar-thumb { background: #666666; border-radius: 4px; }
+.light-melon-mode .chart-container-scroll::-webkit-scrollbar-thumb:hover { background: #333333; }

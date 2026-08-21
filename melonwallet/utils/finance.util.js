@@ -41,9 +41,11 @@ export function computeBalances(simulacoes) {
         const label = getMonthLabel(s.mes_referencia);
         saldoTotal = aplicarValorAoSaldo(saldoTotal, s);
 
-        const txDate = new Date(s.mes_referencia);
+        const partes = String(s.mes_referencia).split('-');
+        const mesTx = parseInt(partes[1], 10) - 1;
+        const anoTx = parseInt(partes[0], 10);
         const hoje = new Date();
-        if (txDate.getMonth() === hoje.getMonth() && txDate.getFullYear() === hoje.getFullYear()) {
+        if (mesTx === hoje.getMonth() && anoTx === hoje.getFullYear()) {
             saldoMesAtual = aplicarValorAoSaldo(saldoMesAtual, s);
         }
 

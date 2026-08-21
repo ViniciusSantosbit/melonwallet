@@ -7,12 +7,18 @@ export function renderBarChart(labels, simulacoes) {
     const ctx = document.getElementById('patrimonioChart').getContext('2d');
     if (barChartInstance) barChartInstance.destroy();
 
-    if (labels.length > 5) {
-        const canvas = document.getElementById('patrimonioChart');
-        canvas.style.width = (labels.length * 110) + 'px';
+    const { entradas, saidas } = buildBarChartData(labels, simulacoes);
+
+    // Meses fantasmas: empurra o gráfico para a esquerda (colado no eixo Y) quando há poucos meses
+    while (labels.length < 6) {
+        labels.push('');
+        entradas.push(null);
+        saidas.push(null);
     }
 
-    const { entradas, saidas } = buildBarChartData(labels, simulacoes);
+    // Largura dinâmica (mínimo para não achatar) -> força scroll horizontal no container
+    const canvas = document.getElementById('patrimonioChart');
+    canvas.style.width = Math.max(labels.length * 80, 480) + 'px';
 
     barChartInstance = new Chart(ctx, {
         type: 'bar',
@@ -20,8 +26,8 @@ export function renderBarChart(labels, simulacoes) {
         data: {
             labels,
             datasets: [
-                { label: 'Entradas', data: entradas, backgroundColor: '#f1f09d', barPercentage: 0.95, categoryPercentage: 1.0 },
-                { label: 'Saídas', data: saidas, backgroundColor: '#c26f03', barPercentage: 0.95, categoryPercentage: 1.0 },
+                { label: 'Entradas', data: entradas, backgroundColor: '#f1f09d', barPercentage: 1.0, categoryPercentage: 0.6 },
+                { label: 'Saídas', data: saidas, backgroundColor: '#c26f03', barPercentage: 1.0, categoryPercentage: 0.6 },
             ],
         },
         options: {
@@ -38,13 +44,16 @@ export function renderBarChart(labels, simulacoes) {
                     align: 'top',
                     offset: 8,
                     font: { size: 9, weight: 'bold' },
-                    formatter: (v, c) => {
-                        const i = c.dataIndex;
-                        if (i === 0) return '';
-                        const p = c.chart.data.datasets[c.datasetIndex].data[i - 1];
-                        if (!p || p === 0) return ''; // Evita divisão por zero
-                        const d = ((Math.abs(v) - Math.abs(p)) / Math.abs(p)) * 100;
-                        return (d >= 0 ? '+' : '') + d.toFixed(0) + '%';
+                    formatter: (value, context) => {
+                        // Esconde labels em meses fantasmas (vazio) e valores zerados
+                        if (value === null || typeof value === 'undefined' || value === 0) return null;
+
+                        // Array em ordem decrescente: índice 0 = mês mais recente, +1 = mês anterior cronologicamente
+                        const valorAntigo = context.dataset.data[context.dataIndex + 1];
+                        if (!valorAntigo) return null;
+
+                        const porcentagem = ((value - valorAntigo) / Math.abs(valorAntigo)) * 100;
+                        return (porcentagem >= 0 ? '+' : '') + porcentagem.toFixed(0) + '%';
                     },
                 },
             },
@@ -61,4 +70,9 @@ export function renderBarChart(labels, simulacoes) {
             },
         },
     });
+
+    const container = document.querySelector('.chart-container-scroll');
+    if (container) {
+        setTimeout(() => { container.scrollLeft = 0; }, 300);
+    }
 }

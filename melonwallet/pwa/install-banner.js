@@ -4,56 +4,52 @@ const isStandalone = window.matchMedia('(display-mode: standalone)').matches || 
 let deferredPrompt = null;
 
 function abrirModalIOS() {
-    document.getElementById('pwa-install-banner').style.display = 'none';
-    document.getElementById('ios-install-modal').style.display = 'flex';
+    const modal = document.getElementById('ios-install-modal');
+    if (modal) modal.style.display = 'flex';
     document.body.style.overflow = 'hidden';
 }
 
 function fecharModalIOS() {
-    document.getElementById('ios-install-modal').style.display = 'none';
+    const modal = document.getElementById('ios-install-modal');
+    if (modal) modal.style.display = 'none';
     document.body.style.overflow = '';
 }
 
 export function initInstallBanner() {
-    const banner = document.getElementById('pwa-install-banner');
-    const btnInstall = document.getElementById('pwa-btn-install');
-    const btnClose = document.getElementById('pwa-btn-close');
+    const btnBaixar = document.getElementById('btn-baixar-app');
+    if (!btnBaixar) return;
 
-    if (!banner || !btnInstall || !btnClose) return;
+    // Oculta até que o navegador permita a instalação (beforeinstallprompt)
+    btnBaixar.style.display = 'none';
 
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;
-        if (!isStandalone && !sessionStorage.getItem('pwa-banner-dismissed')) {
-            setTimeout(() => { banner.style.display = 'block'; }, 3000);
+        if (!isStandalone) {
+            btnBaixar.style.display = 'block';
         }
     });
 
-    btnInstall.addEventListener('click', async () => {
+    btnBaixar.addEventListener('click', async () => {
         if (deferredPrompt) {
             deferredPrompt.prompt();
             await deferredPrompt.userChoice;
             deferredPrompt = null;
-            banner.style.display = 'none';
+            btnBaixar.style.display = 'none';
+        } else if (isIOS && !isStandalone) {
+            abrirModalIOS();
         }
     });
 
-    btnClose.addEventListener('click', () => {
-        banner.style.display = 'none';
-        sessionStorage.setItem('pwa-banner-dismissed', '1');
-    });
-
     window.addEventListener('appinstalled', () => {
-        banner.style.display = 'none';
+        btnBaixar.style.display = 'none';
         deferredPrompt = null;
     });
 
-    if (isIOS && !isStandalone && !sessionStorage.getItem('pwa-banner-dismissed')) {
-        setTimeout(() => {
-            banner.style.display = 'block';
-            btnInstall.textContent = 'Como instalar';
-            btnInstall.addEventListener('click', abrirModalIOS, { once: true });
-        }, 3000);
+    // iOS não dispara beforeinstallprompt: mostra o botão direcionando ao passo-a-passo
+    if (isIOS && !isStandalone) {
+        btnBaixar.style.display = 'block';
+        btnBaixar.textContent = 'Como instalar no iPhone';
     }
 }
 
