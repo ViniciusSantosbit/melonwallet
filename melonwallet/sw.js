@@ -158,20 +158,57 @@ self.addEventListener('sync', (event) => {
   }
 });
 
-// ─── NOTIFICAÇÕES PUSH (base para uso futuro) ─────────────────────────────
+// ─── NOTIFICAÇÕES PUSH ─────────────────────────────────────────────
 self.addEventListener('push', (event) => {
-  const data = event.data?.json() ?? {};
-  self.registration.showNotification(data.title || 'Melon Wallet', {
+  let data = {};
+  try {
+    data = event.data?.json() ?? {};
+  } catch {
+    data = { title: 'Melon Wallet', body: event.data?.text() || 'Nova notificação' };
+  }
+
+  const options = {
     body: data.body || 'Você tem novidades no seu patrimônio!',
-    icon: '/icons/icon-192x192.png',
-    badge: '/icons/icon-72x72.png',
-    data: { url: data.url || '/dashboard.html' }
-  });
+    icon: data.icon || '/icons/icon-192x192.png',
+    badge: '/icons/icon-96x96.png',
+    image: data.image || undefined,
+    vibrate: data.vibrate || [200, 100, 200],
+    tag: data.tag || 'melon-default',
+    renotify: data.renotify ?? true,
+    requireInteraction: data.requireInteraction ?? false,
+    data: {
+      url: data.url || '/dashboard.html',
+      ...data.extraData
+    },
+    actions: data.actions || [
+      { action: 'open', title: 'Abrir', icon: '/icons/icon-96x96.png' },
+      { action: 'dismiss', title: 'Dispensar' }
+    ]
+  };
+
+  event.waitUntil(
+    self.registration.showNotification(data.title || 'Melon Wallet', options)
+  );
 });
 
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
+
+  const notificationData = event.notification.data || {};
+  const targetUrl = notificationData.url || '/dashboard.html';
+
+  if (event.action === 'dismiss') return;
+
   event.waitUntil(
-    clients.openWindow(event.notification.data?.url || '/dashboard.html')
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
+      for (const client of windowClients) {
+        if (client.url.includes(self.location.origin) && 'focus' in client) {
+          client.focus();
+          client.navigate(targetUrl);
+          return;
+        }
+      }
+      return clients.openWindow(targetUrl);
+    })
   );
 });

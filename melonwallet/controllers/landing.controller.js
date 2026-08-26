@@ -221,10 +221,131 @@ window.addEventListener('scroll', () => {
         navbar.classList.remove('scrolled');
     }
 });
-// Dentro da função animate(), substitua a atribuição do ctx.strokeStyle por:
-const isLightMode = document.body.classList.contains('melon-mode');
-if (isLightMode) {
-    ctx.strokeStyle = `rgba(38, 38, 43, ${bright * 0.15})`; // Linhas escuras suaves no fundo creme
+
+/* ═══════════════════════════════════════════════════════════
+   3D TILT CARDS — Vanilla JS Implementation
+   Baseado na lógica React com useMotionValue + useSpring
+   ═══════════════════════════════════════════════════════════ */
+function initTiltCards() {
+    const ROTATION_RANGE = 32.5;
+    const HALF_ROTATION_RANGE = ROTATION_RANGE / 2;
+
+    // Spring simulation parameters (equivalent to useSpring)
+    const SPRING_DAMPING = 20;
+    const SPRING_STIFFNESS = 300;
+
+    class SpringValue {
+        constructor(initial = 0) {
+            this.current = initial;
+            this.target = initial;
+            this.velocity = 0;
+        }
+        set(value) {
+            this.target = value;
+        }
+        update(dt) {
+            // Spring physics: F = -k*x - c*v
+            const force = -SPRING_STIFFNESS * (this.current - this.target) - SPRING_DAMPING * this.velocity;
+            this.velocity += force * dt;
+            this.current += this.velocity * dt;
+            // Stop when velocity is negligible
+            if (Math.abs(this.velocity) < 0.001 && Math.abs(this.current - this.target) < 0.001) {
+                this.current = this.target;
+                this.velocity = 0;
+            }
+        }
+        get value() {
+            return this.current;
+        }
+    }
+
+    function createTiltCard(card) {
+        const inner = card.querySelector('.tilt-card-inner');
+        const layers = card.querySelectorAll('[data-tilt-layer]');
+
+        const rotateX = new SpringValue(0);
+        const rotateY = new SpringValue(0);
+
+        let rafId = null;
+        let lastTime = 0;
+
+        function animate(time) {
+            const dt = lastTime ? Math.min((time - lastTime) / 1000, 0.05) : 0.016;
+            lastTime = time;
+
+            rotateX.update(dt);
+            rotateY.update(dt);
+
+            const rx = rotateX.value;
+            const ry = rotateY.value;
+
+            card.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg)`;
+
+            // Move each layer based on its translateZ depth
+            layers.forEach((layer) => {
+                const z = parseFloat(layer.dataset.tiltLayer) || 0;
+                // Parallax: layers move slightly with rotation
+                const px = -ry * (z / 100) * 0.5;
+                const py = rx * (z / 100) * 0.5;
+                layer.style.transform = `translateZ(${z}px) translate(${px}px, ${py}px)`;
+            });
+
+            if (Math.abs(rotateX.velocity) > 0.0001 || Math.abs(rotateY.velocity) > 0.0001 ||
+                Math.abs(rotateX.current - rotateX.target) > 0.001 || Math.abs(rotateY.current - rotateY.target) > 0.001) {
+                rafId = requestAnimationFrame(animate);
+            } else {
+                rafId = null;
+            }
+        }
+
+        function startAnimation() {
+            if (!rafId) {
+                lastTime = 0;
+                rafId = requestAnimationFrame(animate);
+            }
+        }
+
+        function handleMouseMove(e) {
+            const rect = card.getBoundingClientRect();
+            const width = rect.width;
+            const height = rect.height;
+
+            // Calculate mouse position relative to card
+            const mouseX = (e.clientX - rect.left) * ROTATION_RANGE;
+            const mouseY = (e.clientY - rect.top) * ROTATION_RANGE;
+
+            // Same trigonometry as the React version
+            const rX = (mouseY / height - HALF_ROTATION_RANGE) * -1;
+            const rY = mouseX / width - HALF_ROTATION_RANGE;
+
+            // Update glow position
+            const glowX = ((e.clientX - rect.left) / width) * 100;
+            const glowY = ((e.clientY - rect.top) / height) * 100;
+            card.style.setProperty('--glow-x', `${glowX}%`);
+            card.style.setProperty('--glow-y', `${glowY}%`);
+
+            rotateX.set(rX);
+            rotateY.set(rY);
+            startAnimation();
+        }
+
+        function handleMouseLeave() {
+            rotateX.set(0);
+            rotateY.set(0);
+            startAnimation();
+        }
+
+        card.addEventListener('mousemove', handleMouseMove, { passive: true });
+        card.addEventListener('mouseleave', handleMouseLeave, { passive: true });
+    }
+
+    // Initialize all tilt cards
+    document.querySelectorAll('[data-tilt-card]').forEach(createTiltCard);
+}
+
+// Inicializa cards tilt quando DOM estiver pronto
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initTiltCards);
 } else {
-    ctx.strokeStyle = `rgba(253, 253, 150, ${bright * 0.2})`; // Linhas amarelo pastel no fundo escuro
+    initTiltCards();
 }
