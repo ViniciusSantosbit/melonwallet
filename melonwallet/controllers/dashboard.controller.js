@@ -4,6 +4,7 @@ import { renderBarChart } from '../charts/bar-chart.js';
 import { renderPieChart } from '../charts/pie-chart.js';
 import { hideLoader } from '../components/loader.component.js';
 import { abrirModal, fecharModal } from '../components/modal.component.js';
+import { showMelonConfirm, showMelonAlert } from '../utils/modal.util.js';
 import {
     alternarVisualizacaoSaldo,
     populateMonthSelector,
@@ -173,44 +174,64 @@ function atualizarDashboard() {
 }
 
 async function handleDeleteSimulacao(id) {
-    if (!confirm('Excluir registro?')) return;
+    const confirmado = await showMelonConfirm('Tem certeza que deseja excluir este registro?', {
+        type: 'confirm',
+        icon: '🗑️',
+        confirmLabel: 'Excluir',
+        cancelLabel: 'Cancelar',
+        danger: true,
+    });
+
+    if (!confirmado) return;
     await deletarSimulacao(id);
     await carregarDados();
 }
 
 function editarMeta() {
     const overlay = document.createElement('div');
-    overlay.style.cssText = 'position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);z-index:9999;';
+    overlay.className = 'meta-modal-overlay';
 
-    const modal = document.createElement('div');
-    modal.style.cssText = 'background:#1c1c1e;padding:20px;border-radius:12px;color:#fff;display:flex;flex-direction:column;gap:10px;min-width:260px;';
+    const card = document.createElement('div');
+    card.className = 'meta-modal-card';
+
+    const title = document.createElement('h3');
+    title.textContent = 'Alterar Meta de Investimento';
 
     const input = document.createElement('input');
     input.type = 'number';
     input.value = metaValor;
     input.placeholder = 'Nova meta de investimento (R$)';
-    input.style.cssText = 'padding:10px;border-radius:8px;border:1px solid #333;background:#2c2c2e;color:#fff;font-size:16px;';
 
-    const btnConfirmar = document.createElement('button');
-    btnConfirmar.textContent = 'Salvar';
-    btnConfirmar.style.cssText = 'padding:10px;border-radius:8px;border:none;background:#32D74B;color:#000;font-weight:bold;cursor:pointer;';
+    const actions = document.createElement('div');
+    actions.className = 'meta-modal-actions';
 
-    const btnCancelar = document.createElement('button');
-    btnCancelar.textContent = 'Cancelar';
-    btnCancelar.style.cssText = 'padding:10px;border-radius:8px;border:none;background:#FF453A;color:#fff;cursor:pointer;';
+    const btnConfirm = document.createElement('button');
+    btnConfirm.className = 'btn-confirm';
+    btnConfirm.textContent = 'Salvar';
 
-    modal.appendChild(input);
-    modal.appendChild(btnConfirmar);
-    modal.appendChild(btnCancelar);
-    overlay.appendChild(modal);
+    const btnCancel = document.createElement('button');
+    btnCancel.className = 'btn-cancel';
+    btnCancel.textContent = 'Cancelar';
+
+    actions.appendChild(btnConfirm);
+    actions.appendChild(btnCancel);
+    card.appendChild(title);
+    card.appendChild(input);
+    card.appendChild(actions);
+    overlay.appendChild(card);
     document.body.appendChild(overlay);
+
+    requestAnimationFrame(() => overlay.classList.add('open'));
     input.focus();
 
     function fecharPromptMeta() {
-        document.body.removeChild(overlay);
+        overlay.classList.remove('open');
+        setTimeout(() => {
+            if (overlay.parentNode) document.body.removeChild(overlay);
+        }, 250);
     }
 
-    btnConfirmar.addEventListener('click', () => {
+    btnConfirm.addEventListener('click', () => {
         const novoValor = parseFloat(input.value);
         if (novoValor && !isNaN(novoValor)) {
             metaValor = novoValor;
@@ -221,10 +242,14 @@ function editarMeta() {
         fecharPromptMeta();
     });
 
-    btnCancelar.addEventListener('click', fecharPromptMeta);
+    btnCancel.addEventListener('click', fecharPromptMeta);
     input.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') btnConfirmar.click();
-        if (e.key === 'Escape') btnCancelar.click();
+        if (e.key === 'Enter') btnConfirm.click();
+        if (e.key === 'Escape') btnCancel.click();
+    });
+
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) fecharPromptMeta();
     });
 }
 
@@ -264,22 +289,23 @@ function initOcrFileHandler() {
 
             if (error) {
                 console.error("ERRO DO SUPABASE:", error);
-                alert('Erro ao salvar no banco: ' + error.message);
+                await showMelonAlert('Erro ao salvar no banco: ' + error.message, { type: 'error' });
                 return;
             }
 
             await carregarDados();
 
-            alert(
+            await showMelonAlert(
                 `Comprovante escaneado e salvo com sucesso!\n\n` +
                 `Estabelecimento: ${novaSimulacaoOCR.nome}\n` +
                 `Categoria: ${categoria}\n` +
                 `Data: ${dados.date || 'N/A'}\n` +
-                `Valor: R$ ${novaSimulacaoOCR.valor.toFixed(2)}`
+                `Valor: R$ ${novaSimulacaoOCR.valor.toFixed(2)}`,
+                { type: 'success' }
             );
         } catch (error) {
             console.error("ERRO NO TRY/CATCH:", error);
-            alert('Erro ao escanear: ' + error.message);
+            await showMelonAlert('Erro ao escanear: ' + error.message, { type: 'error' });
         }
     });
 }
@@ -354,7 +380,7 @@ function initSimulacaoForm() {
             if (inserido && inserido.id) transacaoOtimista.id = inserido.id;
         } catch (err) {
             console.error('Erro ao salvar simulação no banco:', err);
-            alert('Erro ao salvar simulação no banco: ' + (err && err.message ? err.message : err));
+            await showMelonAlert('Erro ao salvar simulação no banco: ' + (err && err.message ? err.message : err), { type: 'error' });
             const idx = todasSimulacoes.indexOf(transacaoOtimista);
             if (idx > -1) todasSimulacoes.splice(idx, 1);
             window.todasSimulacoes = todasSimulacoes;

@@ -1,4 +1,5 @@
 import { importarTransacoesPluggy } from '../../services/simulacoes.service.js';
+import { showMelonAlert } from '../../utils/modal.util.js';
 
 export async function gerarConnectToken() {
     const response = await fetch('/api/pluggy-token', {
@@ -107,7 +108,7 @@ export function initPluggySyncButton(onSyncComplete) {
             await sincronizarBanco(onSyncComplete);
         } catch (error) {
             console.error('Erro na sincronização Open Finance:', error);
-            alert('Não foi possível completar a sincronização: ' + error.message);
+            await showMelonAlert('Não foi possível completar a sincronização: ' + error.message, { type: 'error' });
         } finally {
             btn.disabled = false;
             btn.textContent = textoOriginal;

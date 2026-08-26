@@ -1215,6 +1215,617 @@ body.melon-mode .nav-logo img {
     filter: brightness(0); /* Logo preta no Melon Mode */
 }
 
+/* ════════════════════════════════════════════════════
+   MODAL SYSTEM — GLOBAL CUSTOM ALERT/CONFIRM
+   ════════════════════════════════════════════════════ */
+
+.global-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 16px;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+
+.global-modal-overlay.open {
+    opacity: 1;
+    visibility: visible;
+}
+
+.global-modal-card {
+    position: relative;
+    width: 100%;
+    max-width: 420px;
+    padding: 28px 24px 24px;
+    background: rgba(18, 18, 18, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 24px;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.55);
+    color: #fff;
+    text-align: center;
+    transform: translateY(12px) scale(0.98);
+    transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.global-modal-overlay.open .global-modal-card {
+    transform: translateY(0) scale(1);
+}
+
+.global-modal-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+    color: #86868b;
+    font-size: 1.1rem;
+    line-height: 1;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, color 0.2s, transform 0.2s;
+}
+
+.global-modal-close:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    transform: scale(1.05);
+}
+
+.global-modal-icon {
+    font-size: 2rem;
+    margin-bottom: 12px;
+    display: block;
+}
+
+.global-modal-title {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+    letter-spacing: -0.2px;
+    color: #f5f5f7;
+}
+
+.global-modal-body {
+    font-size: 0.95rem;
+    color: #c0c0c0;
+    line-height: 1.5;
+    margin-bottom: 22px;
+}
+
+.global-modal-footer {
+    display: grid;
+    gap: 10px;
+}
+
+.global-modal-footer.cols-2 {
+    grid-template-columns: 1fr 1fr;
+}
+
+.global-modal-footer.cols-1 {
+    grid-template-columns: 1fr;
+}
+
+.global-modal-btn {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 14px;
+    border: none;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s, background 0.2s, box-shadow 0.2s;
+}
+
+.global-modal-btn:hover {
+    transform: translateY(-1px);
+}
+
+.global-modal-btn:active {
+    transform: translateY(0);
+}
+
+.global-modal-btn.primary {
+    background: #f1f193;
+    color: #000;
+    box-shadow: 0 10px 24px rgba(241, 241, 147, 0.18);
+}
+
+.global-modal-btn.primary:hover {
+    background: #ffdb1a;
+}
+
+.global-modal-btn.secondary {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.global-modal-btn.secondary:hover {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.global-modal-btn.danger {
+    background: rgba(255, 69, 58, 0.12);
+    color: #ff453a;
+    border: 1px solid rgba(255, 69, 58, 0.25);
+}
+
+.global-modal-btn.danger:hover {
+    background: rgba(255, 69, 58, 0.22);
+}
+
+.global-modal-input {
+    width: 100%;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px;
+    color: #fff;
+    font-size: 0.95rem;
+    outline: none;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.global-modal-input:focus {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(253, 253, 150, 0.45);
+}
+
+.global-modal-input::placeholder {
+    color: rgba(255, 255, 255, 0.35);
+}
+
+/* Tipo visual por contexto */
+.global-modal-card.type-error .global-modal-icon { color: #ff453a; }
+.global-modal-card.type-success .global-modal-icon { color: #32d74b; }
+.global-modal-card.type-warning .global-modal-icon { color: #fdfd96; }
+.global-modal-card.type-info .global-modal-icon { color: #a1a1a6; }
+
+/* Variantes específicas de overlay */
+.global-modal-overlay.type-dark {
+    background: rgba(0, 0, 0, 0.85);
+}
+
+/* Melhora modal existente de simulação */
+#modal-simulacao .modal-card {
+    max-width: 420px;
+    padding: 28px 24px 24px;
+    border-radius: 24px;
+    transform: translateY(12px) scale(0.98);
+    transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+#modal-simulacao.open .modal-card {
+    transform: translateY(0) scale(1);
+}
+
+/* Melhora modal de editar meta */
+.meta-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    padding: 16px;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.25s ease, visibility 0.25s ease;
+}
+
+.meta-modal-overlay.open {
+    opacity: 1;
+    visibility: visible;
+}
+
+.meta-modal-card {
+    width: 100%;
+    max-width: 380px;
+    padding: 24px;
+    background: rgba(18, 18, 18, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 22px;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.55);
+    color: #fff;
+    transform: translateY(10px) scale(0.98);
+    transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.meta-modal-overlay.open .meta-modal-card {
+    transform: translateY(0) scale(1);
+}
+
+.meta-modal-card h3 {
+    margin: 0 0 14px;
+    font-size: 1.05rem;
+    color: #f5f5f7;
+}
+
+.meta-modal-card input {
+    width: 100%;
+    padding: 14px 16px;
+    margin-bottom: 14px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px;
+    color: #fff;
+    font-size: 0.95rem;
+    outline: none;
+}
+
+.meta-modal-card input:focus {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(253, 253, 150, 0.45);
+}
+
+.meta-modal-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.meta-modal-actions button {
+    padding: 12px 14px;
+    border-radius: 14px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s, background 0.2s;
+}
+
+.meta-modal-actions .btn-confirm {
+    background: #32d74b;
+    color: #000;
+}
+
+.meta-modal-actions .btn-confirm:hover {
+    background: #28c93f;
+    transform: translateY(-1px);
+}
+
+.meta-modal-actions .btn-cancel {
+    background: rgba(255, 69, 58, 0.12);
+    color: #ff453a;
+    border: 1px solid rgba(255, 69, 58, 0.25);
+}
+
+.meta-modal-actions .btn-cancel:hover {
+    background: rgba(255, 69, 58, 0.22);
+    transform: translateY(-1px);
+}
+
+/* Melhora modal iOS */
+.ios-modal-overlay {
+    background: rgba(0, 0, 0, 0.8) !important;
+    backdrop-filter: blur(14px) !important;
+    -webkit-backdrop-filter: blur(14px) !important;
+}
+
+.ios-modal-card {
+    background: rgba(18, 18, 18, 0.98) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    border-radius: 28px 28px 20px 20px !important;
+    box-shadow: 0 -20px 70px rgba(241, 240, 147, 0.08) !important;
+}
+
+/* Responsividade extra para modais */
+@media (max-width: 480px) {
+    .global-modal-card {
+        padding: 22px 18px 18px;
+        border-radius: 22px;
+    }
+
+    .modal-card {
+        padding: 22px 18px 18px !important;
+        border-radius: 22px !important;
+    }
+
+    .meta-modal-card {
+        padding: 20px;
+        border-radius: 20px;
+    }
+
+    .global-modal-title {
+        font-size: 1rem;
+    }
+
+    .global-modal-body {
+        font-size: 0.9rem;
+    }
+
+    .global-modal-btn {
+        padding: 12px;
+        font-size: 0.85rem;
+    }
+}
+
+/* Light mode / Melon mode para modais */
+body.light-melon-mode .global-modal-overlay,
+body.melon-mode .global-modal-overlay {
+    background: rgba(0, 0, 0, 0.45);
+}
+
+body.light-melon-mode .global-modal-card,
+body.melon-mode .global-modal-card {
+    background: #fffef7;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.12);
+    color: #1a1a1a;
+}
+
+body.light-melon-mode .global-modal-title,
+body.melon-mode .global-modal-title {
+    color: #1a1a1a;
+}
+
+body.light-melon-mode .global-modal-body,
+body.melon-mode .global-modal-body {
+    color: #555;
+}
+
+body.light-melon-mode .global-modal-close,
+body.melon-mode .global-modal-close {
+    background: rgba(0, 0, 0, 0.06);
+    border-color: rgba(0, 0, 0, 0.08);
+    color: #888;
+}
+
+body.light-melon-mode .global-modal-close:hover,
+body.melon-mode .global-modal-close:hover {
+    background: rgba(0, 0, 0, 0.1);
+    color: #1a1a1a;
+}
+
+body.light-melon-mode .global-modal-btn.primary,
+body.melon-mode .global-modal-btn.primary {
+    background: #f5c518;
+    color: #1a1a1a;
+    box-shadow: 0 10px 24px rgba(245, 197, 24, 0.25);
+}
+
+body.light-melon-mode .global-modal-btn.primary:hover,
+body.melon-mode .global-modal-btn.primary:hover {
+    background: #e6b800;
+}
+
+body.light-melon-mode .global-modal-btn.secondary,
+body.melon-mode .global-modal-btn.secondary {
+    background: rgba(0, 0, 0, 0.05);
+    color: #1a1a1a;
+    border-color: rgba(0, 0, 0, 0.1);
+}
+
+body.light-melon-mode .global-modal-btn.secondary:hover,
+body.melon-mode .global-modal-btn.secondary:hover {
+    background: rgba(0, 0, 0, 0.08);
+}
+
+body.light-melon-mode .global-modal-btn.danger,
+body.melon-mode .global-modal-btn.danger {
+    background: rgba(255, 69, 58, 0.1);
+    color: #d70015;
+    border-color: rgba(255, 69, 58, 0.25);
+}
+
+body.light-melon-mode .global-modal-btn.danger:hover,
+body.melon-mode .global-modal-btn.danger:hover {
+    background: rgba(255, 69, 58, 0.18);
+}
+
+body.light-melon-mode .global-modal-input,
+body.melon-mode .global-modal-input {
+    background: rgba(0, 0, 0, 0.03);
+    border-color: rgba(0, 0, 0, 0.1);
+    color: #1a1a1a;
+}
+
+body.light-melon-mode .global-modal-input::placeholder,
+body.melon-mode .global-modal-input::placeholder {
+    color: rgba(0, 0, 0, 0.4);
+}
+
+body.light-melon-mode .global-modal-input:focus,
+body.melon-mode .global-modal-input:focus {
+    background: rgba(0, 0, 0, 0.04);
+    border-color: rgba(245, 197, 24, 0.6);
+}
+
+body.light-melon-mode #modal-simulacao .modal-card,
+body.melon-mode #modal-simulacao .modal-card {
+    background: #fffef7;
+    border-color: rgba(0, 0, 0, 0.08);
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.12);
+    color: #1a1a1a;
+}
+
+body.light-melon-mode .meta-modal-overlay,
+body.melon-mode .meta-modal-overlay {
+    background: rgba(0, 0, 0, 0.45);
+}
+
+body.light-melon-mode .meta-modal-card,
+body.melon-mode .meta-modal-card {
+    background: #fffef7;
+    border-color: rgba(0, 0, 0, 0.08);
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.12);
+    color: #1a1a1a;
+}
+
+body.light-melon-mode .meta-modal-card h3,
+body.melon-mode .meta-modal-card h3 {
+    color: #1a1a1a;
+}
+
+body.light-melon-mode .meta-modal-card input,
+body.melon-mode .meta-modal-card input {
+    background: rgba(0, 0, 0, 0.03);
+    border-color: rgba(0, 0, 0, 0.1);
+    color: #1a1a1a;
+}
+
+body.light-melon-mode .meta-modal-card input:focus,
+body.melon-mode .meta-modal-card input:focus {
+    background: rgba(0, 0, 0, 0.04);
+    border-color: rgba(245, 197, 24, 0.6);
+}
+
+body.light-melon-mode .meta-modal-actions .btn-confirm,
+body.melon-mode .meta-modal-actions .btn-confirm {
+    background: #f5c518;
+    color: #1a1a1a;
+}
+
+body.light-melon-mode .meta-modal-actions .btn-confirm:hover,
+body.melon-mode .meta-modal-actions .btn-confirm:hover {
+    background: #e6b800;
+}
+
+body.light-melon-mode .meta-modal-actions .btn-cancel,
+body.melon-mode .meta-modal-actions .btn-cancel {
+    background: rgba(255, 69, 58, 0.1);
+    color: #d70015;
+    border-color: rgba(255, 69, 58, 0.25);
+}
+
+body.light-melon-mode .meta-modal-actions .btn-cancel:hover,
+body.melon-mode .meta-modal-actions .btn-cancel:hover {
+    background: rgba(255, 69, 58, 0.18);
+}
+
+body.light-melon-mode .ios-modal-overlay,
+body.melon-mode .ios-modal-overlay {
+    background: rgba(0, 0, 0, 0.5) !important;
+}
+
+body.light-melon-mode .ios-modal-card,
+body.melon-mode .ios-modal-card {
+    background: #fffef7 !important;
+    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+    color: #1a1a1a !important;
+}
+
+body.light-melon-mode .ios-modal-card h3,
+body.melon-mode .ios-modal-card h3 {
+    color: #1a1a1a !important;
+}
+
+body.light-melon-mode .ios-modal-card > p,
+body.melon-mode .ios-modal-card > p {
+    color: #555 !important;
+}
+
+body.light-melon-mode .ios-steps li,
+body.melon-mode .ios-steps li {
+    color: #333 !important;
+}
+
+body.light-melon-mode .ios-steps strong,
+body.melon-mode .ios-steps strong {
+    color: #1a1a1a !important;
+}
+
+body.light-melon-mode .ios-hint,
+body.melon-mode .ios-hint {
+    background: rgba(245, 197, 24, 0.1) !important;
+    border-color: rgba(245, 197, 24, 0.25) !important;
+    color: #8a6d00 !important;
+}
+
+/* Utilitário para esconder scrollbar do modal quando não necessário */
+.global-modal-overlay .global-modal-card::-webkit-scrollbar {
+    width: 4px;
+}
+
+.global-modal-overlay .global-modal-card::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+body.light-melon-mode .global-modal-card::-webkit-scrollbar-thumb,
+body.melon-mode .global-modal-card::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.12);
+}
+
+/* Links dentro do modal */
+.global-modal-body a {
+    color: #f1f193;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.global-modal-body a:hover {
+    text-decoration: underline;
+}
+
+body.light-melon-mode .global-modal-body a,
+body.melon-mode .global-modal-body a {
+    color: #c29b00;
+}
+
+/* Acessibilidade: foco visível */
+.global-modal-btn:focus-visible,
+.global-modal-close:focus-visible,
+.global-modal-input:focus-visible {
+    outline: 2px solid rgba(253, 253, 150, 0.6);
+    outline-offset: 2px;
+}
+
+body.light-melon-mode .global-modal-btn:focus-visible,
+body.melon-mode .global-modal-btn:focus-visible,
+body.light-melon-mode .global-modal-close:focus-visible,
+body.melon-mode .global-modal-close:focus-visible {
+    outline-color: rgba(245, 197, 24, 0.7);
+}
+
+/* Animação sutil de entrada para ícone */
+@keyframes modalIconPop {
+    0% { transform: scale(0.8); opacity: 0; }
+    70% { transform: scale(1.05); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.global-modal-overlay.open .global-modal-icon {
+    animation: modalIconPop 0.35s 0.05s ease both;
+}
+
+/* Ajuste final para telas muito pequenas */
+@media (max-width: 360px) {
+    .global-modal-card {
+        padding: 18px 14px 16px;
+        border-radius: 20px;
+    }
+
+    .global-modal-title {
+        font-size: 0.95rem;
+    }
+
+    .global-modal-body {
+        font-size: 0.85rem;
+    }
+
+    .global-modal-btn {
+        padding: 11px;
+        font-size: 0.82rem;
+    }
+}
+
 /* Logo dentro do card (brand-container) também escura no white mode */
 body.melon-mode .logo-melon {
     filter: brightness(0); /* Logo escura dentro do card no Melon Mode */

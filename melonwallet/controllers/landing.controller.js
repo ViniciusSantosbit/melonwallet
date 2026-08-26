@@ -3,6 +3,7 @@ import { login, register } from '../services/auth.service.js';
 import { persistSession, redirectIfAuthenticated } from '../services/session.service.js';
 import { initInstallBanner } from '../pwa/install-banner.js';
 import { registerServiceWorker } from '../pwa/register-sw.js';
+import { showMelonAlert } from '../utils/modal.util.js';
 
 redirectIfAuthenticated();
 
@@ -55,14 +56,14 @@ function initLoginForm() {
             const { data, error } = await login(email, senha);
 
             if (error || !data) {
-                alert('E-mail ou senha incorretos! 🍈');
+                await showMelonAlert('E-mail ou senha incorretos! 🍈', { type: 'error' });
             } else {
                 persistSession(data);
-                alert(`Bem-vindo de volta, ${data.nome}!`);
+                await showMelonAlert(`Bem-vindo de volta, ${data.nome}!`, { type: 'success' });
                 window.location.href = 'dashboard.html';
             }
         } catch (err) {
-            alert('Erro inesperado: ' + err.message);
+            await showMelonAlert('Erro inesperado: ' + err.message, { type: 'error' });
         } finally {
             btn.innerText = originalText;
             btn.disabled = false;
@@ -87,9 +88,9 @@ function initCadastroForm() {
             const { data, error } = await register({ nome, email, senha });
 
             if (error) {
-                alert('Erro ao cadastrar: ' + error.message);
+                await showMelonAlert('Erro ao cadastrar: ' + error.message, { type: 'error' });
             } else {
-                alert('Conta criada com sucesso! 🍈');
+                await showMelonAlert('Conta criada com sucesso! 🍈', { type: 'success' });
                 if (data && data[0]) {
                     persistSession(data[0]);
                     window.location.href = 'dashboard.html';
@@ -99,7 +100,7 @@ function initCadastroForm() {
                 }
             }
         } catch (err) {
-            alert('Erro inesperado: ' + err.message);
+            await showMelonAlert('Erro inesperado: ' + err.message, { type: 'error' });
         } finally {
             btn.innerText = originalText;
             btn.disabled = false;
