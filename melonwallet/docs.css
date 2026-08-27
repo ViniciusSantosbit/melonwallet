@@ -1,0 +1,356 @@
+/* --- CONFIGURAÇÕES GERAIS --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+}
+
+html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    touch-action: pan-y manipulation;
+    background-color: #000;
+    color: #fff;
+    min-height: 100vh;
+}
+
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('../fundo.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    filter: brightness(0.07);
+    z-index: -1;
+}
+
+/* --- LAYOUT --- */
+.docs-wrapper {
+    display: flex;
+    min-height: 100vh;
+    max-width: 100%;
+}
+
+.docs-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 280px;
+    height: 100vh;
+    background: rgba(18, 18, 18, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 40px 24px;
+    overflow-y: auto;
+    z-index: 100;
+}
+
+.docs-sidebar::-webkit-scrollbar {
+    width: 4px;
+}
+
+.docs-sidebar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.docs-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 40px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.docs-brand img {
+    width: 40px;
+    height: 40px;
+}
+
+.docs-brand span {
+    font-weight: 700;
+    font-size: 1.1rem;
+    letter-spacing: -0.5px;
+    color: #fdfd96;
+}
+
+.docs-nav {
+    list-style: none;
+}
+
+.docs-nav-item {
+    margin-bottom: 4px;
+}
+
+.docs-nav-link {
+    display: block;
+    padding: 10px 16px;
+    color: #86868b;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
+}
+
+.docs-nav-link:hover,
+.docs-nav-link.active {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.05);
+    border-left-color: #fdfd96;
+}
+
+.docs-nav-group {
+    margin-top: 24px;
+}
+
+.docs-nav-group-title {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #484f58;
+    margin-bottom: 10px;
+    padding: 0 16px;
+    font-weight: 600;
+}
+
+/* --- CONTEÚDO PRINCIPAL --- */
+.docs-main {
+    flex: 1;
+    margin-left: 280px;
+    padding: 60px 80px;
+    max-width: calc(100% - 280px);
+}
+
+.docs-header {
+    margin-bottom: 60px;
+    padding-bottom: 30px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.docs-header h1 {
+    font-size: 2.8rem;
+    font-weight: 800;
+    letter-spacing: -1px;
+    margin-bottom: 12px;
+    color: #fff;
+}
+
+.docs-header p {
+    font-size: 1.1rem;
+    color: #86868b;
+    max-width: 700px;
+    line-height: 1.6;
+}
+
+.docs-section {
+    margin-bottom: 70px;
+    scroll-margin-top: 40px;
+}
+
+.docs-section h2 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 24px;
+    color: #fdfd96;
+    letter-spacing: -0.3px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.docs-section h2::before {
+    content: "";
+    display: block;
+    width: 4px;
+    height: 24px;
+    background: #fdfd96;
+    border-radius: 2px;
+}
+
+.docs-section h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 28px 0 14px;
+    color: #fff;
+}
+
+.docs-section p {
+    font-size: 1rem;
+    line-height: 1.8;
+    color: #c0c0c0;
+    margin-bottom: 16px;
+}
+
+.docs-section ul,
+.docs-section ol {
+    margin: 16px 0 16px 24px;
+    color: #c0c0c0;
+    line-height: 1.8;
+}
+
+.docs-section li {
+    margin-bottom: 8px;
+}
+
+.docs-section strong {
+    color: #fff;
+    font-weight: 600;
+}
+
+/* --- BLOCOS DE CÓDIGO --- */
+.docs-code {
+    background: rgba(18, 18, 18, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin: 20px 0;
+    overflow-x: auto;
+    font-family: "SF Mono", Monaco, Inconsolata, "Fira Code", monospace;
+    font-size: 0.85rem;
+    line-height: 1.7;
+    color: #c0c0c0;
+}
+
+.docs-code .keyword {
+    color: #f099b3;
+}
+
+.docs-code .string {
+    color: #00ff87;
+}
+
+.docs-code .comment {
+    color: #484f58;
+    font-style: italic;
+}
+
+/* --- CALLOUTS --- */
+.docs-callout {
+    background: rgba(253, 253, 150, 0.06);
+    border: 1px solid rgba(253, 253, 150, 0.15);
+    border-radius: 12px;
+    padding: 18px 22px;
+    margin: 20px 0;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+}
+
+.docs-callout-icon {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.docs-callout p {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.docs-callout.warning {
+    background: rgba(255, 69, 58, 0.08);
+    border-color: rgba(255, 69, 58, 0.2);
+}
+
+.docs-callout.warning .docs-callout-icon {
+    color: #ff453a;
+}
+
+/* --- RESPONSIVO --- */
+@media (max-width: 900px) {
+    .docs-sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+    }
+
+    .docs-main {
+        margin-left: 0;
+        max-width: 100%;
+        padding: 40px 24px;
+    }
+
+    .docs-header h1 {
+        font-size: 2rem;
+    }
+
+    .docs-section h2 {
+        font-size: 1.4rem;
+    }
+}
+
+@media (min-width: 901px) {
+    .docs-sidebar {
+        transform: translateX(0);
+    }
+}
+
+/* --- TIPOGRAFIA --- */
+.docs-section a {
+    color: #f1f193;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.docs-section a:hover {
+    text-decoration: underline;
+}
+
+.docs-section hr {
+    border: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    margin: 40px 0;
+}
+
+.docs-section table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 0.95rem;
+}
+
+.docs-section th {
+    text-align: left;
+    padding: 12px 16px;
+    color: #86868b;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.docs-section td {
+    padding: 14px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    color: #c0c0c0;
+}
+
+.docs-section tr:hover td {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+/* --- SCROLLBAR GLOBAL --- */
+::-webkit-scrollbar {
+    height: 8px;
+    width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}

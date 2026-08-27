@@ -1,15 +1,51 @@
 /* --- CONFIGURAÇÕES GERAIS --- */
 * {
-    margin: 0; /* Reseta a margem padrão de todos os elementos */
-    padding: 0; /* Reseta o padding padrão de todos os elementos */
-    box-sizing: border-box; /* Faz padding/border entrar na largura total do elemento */
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif; /* Fonte base do site (prioriza fontes do sistema) */
-    scroll-behavior: smooth; /* Rolagem suave quando usando âncoras internas */
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+    scroll-behavior: smooth;
+}
+
+button,
+.btn-main,
+.btn-white,
+.nav-btn-login,
+.nav-btn-signup,
+.btn-theme-toggle,
+.btn-add-simulacao,
+.btn-scan-receipt,
+.btn-sync-bank,
+.btn-delete,
+.close-btn,
+.btn-edit-goal,
+.nav-btn-logout,
+.bank-dropdown-item,
+.global-modal-btn,
+.meta-modal-actions button,
+input[type="submit"],
+input[type="button"] {
+    user-select: none;
+}
+
+.glass-card,
+.glass-card-dash,
+.metric-card,
+.feature-card,
+.tilt-card,
+.modal-card,
+.meta-modal-card,
+.global-modal-card,
+.ios-modal-card,
+.expense-insight-card {
+    user-select: none;
 }
 
 html, body {
-    max-width: 100%; /* Evita scrollbar horizontal em telas estreitas */
-    overflow-x: hidden; /* Bloqueia rolagem horizontal indesejada */
+    max-width: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    touch-action: pan-y manipulation;
 }
 
 body {
@@ -169,8 +205,8 @@ body::before {
     border: 1px solid rgba(255, 255, 255, 0.1); /* Borda branca sutil */
     border-radius: 32px; /* Bordas muito arredondadas */
     padding: 24px 20px; /* Padding interno */
-    width: min(400px, calc(100vw - 32px)); /* Largura responsiva: 400px ou viewport - 32px */
-    max-width: 320px; /* Largura máxima de 320px */
+    width: min(320px, calc(100vw - 32px));
+    max-width: 320px;
     margin-top: 10px; /* Espaçamento superior */
     box-sizing: border-box; /* Inclui padding/border na largura */
     box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5); /* Sombra externa pronunciada */
@@ -393,10 +429,11 @@ input:focus {
 }
 
 .phone-real-img {
-    position: relative; /* Sobre o glow */
-    z-index: 1; /* Acima do glow */
-    width: 300px; /* Largura da imagem do phone */
-    height: auto; /* Altura automática (mantém proporção) */
+    position: relative;
+    z-index: 1;
+    width: 300px;
+    max-width: 100%;
+    height: auto;
     filter:
         drop-shadow(0 50px 80px rgba(0,0,0,0.9))
         drop-shadow(0 0 40px rgba(241,240,147,0.07)); /* Sombra projetada + glow dourado */
@@ -536,7 +573,8 @@ td { padding: 12px; color: #c9d1d9; white-space: nowrap; } /* Células: padding,
 
 .header-actions .btn-add-simulacao,
 .header-actions .btn-scan-receipt {
-    width: 220px; /* Largura fixa de 220px para os botões do header */
+    width: 220px;
+    max-width: 100%;
 }
 
 .btn-add-simulacao {

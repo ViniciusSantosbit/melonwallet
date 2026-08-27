@@ -16,10 +16,6 @@ export function renderBarChart(labels, simulacoes) {
         saidas.push(null);
     }
 
-    // Largura dinâmica (mínimo para não achatar) -> força scroll horizontal no container
-    const canvas = document.getElementById('patrimonioChart');
-    canvas.style.width = Math.max(labels.length * 80, 480) + 'px';
-
     barChartInstance = new Chart(ctx, {
         type: 'bar',
         plugins: [ChartDataLabels],
