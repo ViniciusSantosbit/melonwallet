@@ -1,5 +1,9 @@
-const SUPABASE_URL = 'https://kffrtelbeqpgiakgsehu.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtmZnJ0ZWxiZXFwZ2lha2dzZWh1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0NDc3MjAsImV4cCI6MjA5MjAyMzcyMH0.DoUtb4aCl1l1FizbjPpWYCGlNRjHAtL5zjQjNcIRIy8';
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY;
+
+if (!SUPABASE_URL || !SUPABASE_KEY) {
+    console.error('❌ Variáveis SUPABASE_URL e SUPABASE_ANON_KEY são obrigatórias no .env');
+}
 
 export const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 

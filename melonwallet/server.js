@@ -1,4 +1,5 @@
 import express from 'express';
+import 'dotenv/config';
 import webpush from 'web-push';
 import cors from 'cors';
 import { readFileSync, writeFileSync, existsSync } from 'fs';

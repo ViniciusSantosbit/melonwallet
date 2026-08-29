@@ -83,7 +83,16 @@ export default async function handler(req) {
         ocrForm.append('language', 'por');
         ocrForm.append('isOverlayRequired', 'false');
         
-        ocrForm.append('apikey', process.env.OCR_SPACE_API_KEY || '017c91b1a888957'); 
+        const ocrApiKey = process.env.OCR_SPACE_API_KEY;
+
+        if (!ocrApiKey) {
+            return new Response(JSON.stringify({ error: 'OCR_SPACE_API_KEY não configurada no servidor' }), {
+                status: 500,
+                headers: { 'Content-Type': 'application/json' },
+            });
+        }
+
+        ocrForm.append('apikey', ocrApiKey); 
 
         const response = await fetch('https://api.ocr.space/parse/image', {
             method: 'POST',
