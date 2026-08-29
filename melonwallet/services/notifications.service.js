@@ -1,38 +1,29 @@
 import webpush from 'web-push';
-import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
+import { dirname } from 'path';
+import {
+    listarPushSubscriptions,
+    removerPushSubscriptionsExpiradas
+} from '../adapters/supabase/push-subscriptions.adapter.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
-const VAPID_FILE = join(__dirname, 'vapid-keys.json');
-const SUBSCRIPTIONS_FILE = join(__dirname, 'subscriptions.json');
+const VAPID_PUBLIC_KEY = process.env.VAPID_PUBLIC_KEY;
+const VAPID_PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY;
+const VAPID_SUBJECT = process.env.VAPID_SUBJECT || 'mailto:contato@melonwallet.app';
 
 function getVapidKeys() {
-    if (existsSync(VAPID_FILE)) {
-        return JSON.parse(readFileSync(VAPID_FILE, 'utf8'));
+    if (VAPID_PUBLIC_KEY && VAPID_PRIVATE_KEY) {
+        return { publicKey: VAPID_PUBLIC_KEY, privateKey: VAPID_PRIVATE_KEY };
     }
-    throw new Error('Execute o server.js primeiro para gerar as chaves VAPID');
-}
-
-function loadSubscriptions() {
-    if (!existsSync(SUBSCRIPTIONS_FILE)) return [];
-    try {
-        return JSON.parse(readFileSync(SUBSCRIPTIONS_FILE, 'utf8'));
-    } catch {
-        return [];
-    }
-}
-
-function saveSubscriptions(subscriptions) {
-    writeFileSync(SUBSCRIPTIONS_FILE, JSON.stringify(subscriptions, null, 2));
+    throw new Error('Configure VAPID_PUBLIC_KEY e VAPID_PRIVATE_KEY no ambiente');
 }
 
 const vapidKeys = getVapidKeys();
 webpush.setVAPIDDetails(
-    'mailto:contato@melonwallet.app',
+    VAPID_SUBJECT,
     vapidKeys.publicKey,
     vapidKeys.privateKey
 );
@@ -164,36 +155,53 @@ async function sendPushNotification(subscription, payload) {
     }
 }
 
+function toPushSubscription(dbSub) {
+    return {
+        endpoint: dbSub.endpoint,
+        keys: { p256dh: dbSub.p256dh, auth: dbSub.auth },
+        monthlyPrice: dbSub.monthly_price,
+        startDate: dbSub.start_date,
+        name: dbSub.name,
+        renewalDay: dbSub.renewal_day,
+        userId: dbSub.user_id,
+        createdAt: dbSub.created_at,
+        updatedAt: dbSub.updated_at,
+    };
+}
+
 export async function processAndSendNotifications() {
-    const subscriptions = loadSubscriptions();
-    if (subscriptions.length === 0) {
+    const dbSubscriptions = await listarPushSubscriptions();
+    if (dbSubscriptions.length === 0) {
         console.log('[Nenhuma inscrição ativa]');
         return { sent: 0, expired: 0 };
     }
 
+    const subscriptions = dbSubscriptions.map(toPushSubscription);
     let sentCount = 0;
     let expiredCount = 0;
+    const expiredEndpoints = [];
 
     for (const subscription of subscriptions) {
         if (subscription.monthlyPrice && subscription.startDate) {
             const result = await sendAccumulatedTrackingNotification(subscription, subscription);
             if (result.success) sentCount++;
-            if (result.expired) expiredCount++;
+            if (result.expired) {
+                expiredCount++;
+                expiredEndpoints.push(subscription.endpoint);
+            }
         }
     }
 
     const weeklyResult = await sendWeeklySummaryToAll(subscriptions);
     sentCount += weeklyResult.sent;
+    expiredEndpoints.push(...weeklyResult.expiredEndpoints);
 
-    if (expiredCount > 0) {
-        const active = subscriptions.filter(s =>
-            !weeklyResult.expiredEndpoints.includes(s.endpoint)
-        );
-        saveSubscriptions(active);
+    if (expiredEndpoints.length > 0) {
+        await removerPushSubscriptionsExpiradas(expiredEndpoints);
     }
 
-    console.log(`[Processamento] ${sentCount} enviadas, ${expiredCount} expiradas`);
-    return { sent: sentCount, expired: expiredCount };
+    console.log(`[Processamento] ${sentCount} enviadas, ${expiredEndpoints.length} expiradas`);
+    return { sent: sentCount, expired: expiredEndpoints.length };
 }
 
 async function sendWeeklySummaryToAll(subscriptions) {
@@ -216,12 +224,16 @@ async function sendWeeklySummaryToAll(subscriptions) {
 }
 
 export async function addSubscriptionCategory(subscriptionEndpoint, categoryData) {
-    const subscriptions = loadSubscriptions();
-    const index = subscriptions.findIndex(s => s.endpoint === subscriptionEndpoint);
+    const { salvarPushSubscription, listarPushSubscriptions } = await import('../adapters/supabase/push-subscriptions.adapter.js');
+    const subscriptions = await listarPushSubscriptions();
+    const existing = subscriptions.find(s => s.endpoint === subscriptionEndpoint);
 
-    if (index >= 0) {
-        subscriptions[index] = { ...subscriptions[index], ...categoryData };
-        saveSubscriptions(subscriptions);
+    if (existing) {
+        await salvarPushSubscription({
+            ...existing,
+            ...categoryData,
+            updatedAt: new Date().toISOString(),
+        });
         return { success: true, message: 'Categoria atualizada' };
     }
 
@@ -229,12 +241,12 @@ export async function addSubscriptionCategory(subscriptionEndpoint, categoryData
 }
 
 export async function getSubscriptionStats() {
-    const subscriptions = loadSubscriptions();
-    const total = subscriptions.length;
-    const totalMonthly = subscriptions.reduce((sum, s) => sum + (s.monthlyPrice || 0), 0);
-    const services = subscriptions
-        .filter(s => s.monthlyPrice)
-        .map(s => ({ name: s.name, price: s.monthlyPrice }));
+    const dbSubscriptions = await listarPushSubscriptions();
+    const total = dbSubscriptions.length;
+    const totalMonthly = dbSubscriptions.reduce((sum, s) => sum + (s.monthly_price || 0), 0);
+    const services = dbSubscriptions
+        .filter(s => s.monthly_price)
+        .map(s => ({ name: s.name, price: s.monthly_price }));
 
     return {
         totalSubscriptions: total,
