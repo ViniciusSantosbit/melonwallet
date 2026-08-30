@@ -3,7 +3,7 @@ import 'dotenv/config';
 import webpush from 'web-push';
 import cors from 'cors';
 import { fileURLToPath } from 'url';
-import { dirname } from 'path';
+import { dirname, join } from 'path';
 import {
     listarPushSubscriptions,
     salvarPushSubscription,
@@ -26,7 +26,13 @@ const VAPID_SUBJECT = process.env.VAPID_SUBJECT || 'mailto:contato@melonwallet.a
 
 app.use(cors({ origin: FRONTEND_URL }));
 app.use(express.json());
-app.use(express.static(__dirname, { extensions: ['html'] }));
+
+const publicDir = join(__dirname);
+app.use(express.static(publicDir, { extensions: ['html'] }));
+
+app.get('/', (req, res) => {
+    res.sendFile(join(publicDir, 'index.html'));
+});
 
 function getVapidKeys() {
     if (VAPID_PUBLIC_KEY && VAPID_PRIVATE_KEY) {
@@ -165,6 +171,10 @@ if (!process.env.VERCEL) {
         console.log(`[Server] VAPID Public Key: ${vapidKeys.publicKey}`);
     });
 }
+
+app.get('*', (req, res) => {
+    res.sendFile(join(publicDir, 'index.html'));
+});
 
 export default app;
 export { vapidKeys };
