@@ -2,7 +2,7 @@ import express from 'express';
 import 'dotenv/config';
 import webpush from 'web-push';
 import cors from 'cors';
-import { readFileSync, readdirSync } from 'fs';
+import { readFileSync, readdirSync, existsSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import {
@@ -200,7 +200,12 @@ if (!process.env.VERCEL) {
 }
 
 app.get('*', (req, res) => {
-    res.sendFile(join(publicDir, 'index.html'));
+    const filePath = join(publicDir, req.path);
+    if (existsSync(filePath) && !req.path.endsWith('.html')) {
+        res.sendFile(filePath);
+    } else {
+        res.sendFile(join(publicDir, 'index.html'));
+    }
 });
 
 export default app;
