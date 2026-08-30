@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Melon Wallet — Documentação Oficial</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="stylesheet" href="docs.css">
+    <!-- ═══ PWA ═══ -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Melon Wallet">
+    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="apple-touch-icon" href="/icons/icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192x192.png">
+    <!-- ═══════════ -->
+</head>
+<body>
+
+    <div class="docs-wrapper">
+        <!-- MENU LATERAL -->
+        <aside class="docs-sidebar">
+            <div class="docs-brand">
+                <img src="logo.png" alt="Melon Logo">
+                <span>Melon Docs</span>
+            </div>
+
+            <nav>
+                <ul class="docs-nav">
+                    <li class="docs-nav-group">
+                        <div class="docs-nav-group-title">Fundamentos</div>
+                        <ul class="docs-nav">
+                            <li class="docs-nav-item"><a href="#visao-geral" class="docs-nav-link active">Visão Geral</a></li>
+                            <li class="docs-nav-item"><a href="#pwa-offline" class="docs-nav-link">PWA & Offline</a></li>
+                            <li class="docs-nav-item"><a href="#ia-guardrails" class="docs-nav-link">IA & Guardrails</a></li>
+                            <li class="docs-nav-item"><a href="#autenticacao" class="docs-nav-link">Autenticação & BD</a></li>
+                        </ul>
+                    </li>
+                    <li class="docs-nav-group">
+                        <div class="docs-nav-group-title">Interface</div>
+                        <ul class="docs-nav">
+                            <li class="docs-nav-item"><a href="#design-system" class="docs-nav-link">Design System</a></li>
+                            <li class="docs-nav-item"><a href="#componentes" class="docs-nav-link">Componentes</a></li>
+                            <li class="docs-nav-item"><a href="#fluxos" class="docs-nav-link">Fluxos Principais</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- CONTEÚDO PRINCIPAL -->
+        <main class="docs-main">
+            <header class="docs-header">
+                <h1>Manual Técnico — Melon Wallet</h1>
+                <p>Documentação oficial da arquitetura, componentes, políticas de segurança e diretrizes de interface do Melon Wallet.</p>
+            </header>
+
+            <!-- VISÃO GERAL -->
+            <section id="visao-geral" class="docs-section">
+                <h2>Visão Geral do Sistema</h2>
+
+                <h3>Propósito e Proposta de Valor</h3>
+                <p>O Melon Wallet é uma plataforma unificada de gestão financeira pessoal, projetada para funcionar como aplicativo nativo em dispositivos móveis e desktop. Sua proposta de valor combina simulação de patrimônio, acompanhamento de investimentos, categorização inteligente de gastos e assistência por inteligência artificial em uma experiência contínua, com foco em privacidade, performance offline e usabilidade mobile.</p>
+
+                <h3>Arquitetura Funcional</h3>
+                <p>O sistema organiza-se em camadas desacopladas:</p>
+                <ul>
+                    <li><strong>Interface do usuário (Front-end)</strong>: Responsável por toda a interação visual, entrada de dados, renderização de gráficos e orquestração local dos estados da aplicação.</li>
+                    <li><strong>Serviços em nuvem (Backend)</strong>: Gerencia autenticação, persistência de dados financeiros e sincronização em tempo real entre dispositivos.</li>
+                    <li><strong>Motor de Inteligência Artificial</strong>: Atua como assistente financeiro especializado, recebendo contexto do usuário e retornando respostas orientadas a finanças pessoais.</li>
+                    <li><strong>Camada PWA (Progressive Web App)</strong>: Envolve a aplicação com capacidades de instalação, cache inteligente e funcionamento offline, eliminando dependência de conectividade contínua.</li>
+                </ul>
+                <p>A comunicação entre essas camadas segue o princípio de menor privilégio: o front-end consome apenas os endpoints estritamente necessários, enquanto o motor de IA opera com regras de contenção que impedem vazamento de contexto para assuntos externos ao domínio financeiro.</p>
+
+                <h3>Stack Tecnológica</h3>
+                <ul>
+                    <li><strong>Front-end</strong>: Aplicação web modular baseada em JavaScript puro, sem frameworks pesados, priorizando performance e controle granular do DOM.</li>
+                    <li><strong>Estilização</strong>: CSS puro com arquitetura de design system própria, utilizando variáveis CSS, grid, flexbox e media queries para responsividade.</li>
+                    <li><strong>Backend</strong>: Ambiente de execução JavaScript server-side, responsável por serviços auxiliares como gerenciamento de notificações push.</li>
+                    <li><strong>Funções serverless</strong>: Rotas de API executadas em ambiente serverless para integração com serviços de IA, OCR e Open Finance.</li>
+                    <li><strong>Banco de dados</strong>: PostgreSQL gerenciado, com sincronização em tempo real via mecanismos nativos da plataforma.</li>
+                    <li><strong>PWA</strong>: Service Worker com estratégias de cache híbrido, manifestos de instalação e suporte a notificações push.</li>
+                    <li><strong>Inteligência Artificial</strong>: Modelo de linguagem especializado em finanças, operando via proxy server-side para proteção de credenciais.</li>
+                    <li><strong>Gráficos</strong>: Biblioteca de visualização adaptativa com plugins de rótulos, otimizada para dashboards financeiros.</li>
+                </ul>
+            </section>
+
+            <!-- PWA & OFFLINE -->
+            <section id="pwa-offline" class="docs-section">
+                <h2>PWA & Funcionamento Offline</h2>
+
+                <h3>Service Worker e Ciclo de Vida</h3>
+                <p>O aplicativo utiliza um service worker para interceptar requisições de rede e gerenciar o ciclo de vida da aplicação fora do navegador. Esse componente roda em background independente da interface e é responsável por:</p>
+                <ul>
+                    <li>Registrar-se automaticamente na primeira visita e nas atualizações de versão;</li>
+                    <li>Controlar a transição entre versões sem intervenção do usuário;</li>
+                    <li>Garantir que ativos essenciais permaneçam disponíveis mesmo após fechamento completo do navegador (modo standalone);</li>
+                    <li>Gerenciar a transição entre estados online e offline com mínimo impacto na experiência.</li>
+                </ul>
+
+                <h3>Estratégia de Cache Híbrido</h3>
+                <p>A estratégia de cache distingue três categorias de conteúdo:</p>
+                <ol>
+                    <li><strong>Navegação e shell da aplicação</strong>: A estrutura visual principal (layout, componentes estruturais, telas-base) é cacheada com atualização em background, garantindo que o usuário sempre abra a interface mesmo sem internet.</li>
+                    <li><strong>Dados estáticos</strong>: Imagens, ícones, fontes e recursos do design system seguem política de cache com validade estendida e invalidação por hash, evitando downloads repetidos.</li>
+                    <li><strong>Estados e dados dinâmicos</strong>: As informações financeiras do usuário são armazenadas localmente com sincronização diferida. Quando o dispositivo detecta perda de conectividade, o app transiciona silenciosamente para leitura e escrita no armazenamento local, e reconcilia alterações com a nuvem assim que a conexão é restaurada.</li>
+                </ol>
+
+                <h3>Notificações Push e Rastreamento de Assinaturas</h3>
+                <p>O sistema implementa notificações push como canal proativo de engajamento, com duas modalidades principais:</p>
+                <ul>
+                    <li><strong>Alertas acionáveis</strong>: Notificações que exigem resposta do usuário (ex: confirmação de meta atingida, solicitação de revisão de categoria), apresentando ações diretas na própria notificação.</li>
+                    <li><strong>Resumos inteligentes</strong>: Agrupamento periódico de ocorrências financeiras relevantes, entregando um panorama consolidado sem poluição de notificações individuais.</li>
+                </ul>
+                <p>O gerenciamento de inscrições é feito de forma transparente, permitindo que o usuário gerencie preferências de recebimento por tipo de evento diretamente no aplicativo.</p>
+            </section>
+
+            <!-- IA & GUARDRAILS -->
+            <section id="ia-guardrails" class="docs-section">
+                <h2>Inteligência Artificial & Guardrails de Segurança</h2>
+
+                <h3>O Papel do Assistente Financeiro</h3>
+                <p>O assistente de inteligência artificial funciona como um especialista em finanças pessoais integrado à experiência do usuário. Ele recebe contexto sobre os dados do aplicativo (histórico de transações, metas, saldo) e responde em linguagem natural, auxiliando em:</p>
+                <ul>
+                    <li>Interpretação de tendências de gastos e receitas;</li>
+                    <li>Sugestões de categorização e organização financeira;</li>
+                    <li>Explicações de termos e indicadores presentes na interface;</li>
+                    <li>Alertas baseados no comportamento financeiro do usuário.</li>
+                </ul>
+                <p>A inteligência artificial não executa ações financeiras automaticamente; seu papel é exclusivamente informativo e consultivo.</p>
+
+                <h3>Política e Regras de Contenção (Guardrails)</h3>
+
+                <h3>Nível 1 — Foco Total</h3>
+                <p>O assistente opera estritamente dentro do domínio de finanças pessoais e dados do aplicativo. Sua base de conhecimento e capacidade de interpretação estão limitadas a:</p>
+                <ul>
+                    <li>Perguntas sobre saldo, rendimentos, investimentos e metas;</li>
+                    <li>Dúvidas sobre funcionalidades disponíveis na plataforma;</li>
+                    <li>Análise de padrões de consumo e sugestões de planejamento.</li>
+                </ul>
+
+                <h3>Nível 2 — Bloqueio Absoluto</h3>
+                <p>Qualquer solicitação fora do escopo financeiro é bloqueada de forma explícita e polida. Isso inclui, mas não se limita a, entretenimento, cultura pop, política, esportes, tecnologia geral e temas pessoais não relacionados à gestão financeira. O assistente não gera conteúdo fora desse domínio, mesmo que solicitado de forma indireta.</p>
+
+                <h3>Nível 3 — Ponte de Contexto</h3>
+                <p>Saudações genéricas, perguntas utilitárias sobre o aplicativo (ex: "que horas são?", "qual a previsão do tempo?") e cumprimentos são redirecionadas inteligentemente de volta ao contexto financeiro. O assistente reconhece a intenção do usuário, mas reapresenta a conversa dentro do universo do aplicativo, preservando a experiência focada sem ignorar a interação.</p>
+            </section>
+
+            <!-- AUTENTICAÇÃO & BANCO DE DADOS -->
+            <section id="autenticacao" class="docs-section">
+                <h2>Autenticação & Banco de Dados (Segurança e Privacidade)</h2>
+
+                <h3>Camada de Persistência e Sincronização</h3>
+                <p>Os dados financeiros dos usuários são armazenados em infraestrutura de nuvem com sincronização em tempo real. Essa camada garante que alterações feitas em um dispositivo (lançamentos, edições de meta, uploads de comprovantes) estejam disponíveis imediatamente em todos os dispositivos autenticados do mesmo usuário.</p>
+                <p>A sincronização segue modelo otimista com reconciliação eventual: alterações são aplicadas localmente antes de confirmadas na nuvem, e conflitos são resolvidos por regras de consistência configuradas no backend, sem exigir intervenção do usuário na maioria dos casos.</p>
+
+                <h3>Padrões de Segurança Aplicados</h3>
+                <ul>
+                    <li><strong>Autenticação</strong>: O fluxo de autenticação utiliza protocolos seguros com troca de credenciais criptografadas, sem exposição de segredos no front-end.</li>
+                    <li><strong>Transporte</strong>: Toda comunicação entre cliente e servidor é realizada sobre conexão criptografada.</li>
+                    <li><strong>Autorização</strong>: O acesso a dados é isolado por usuário; o back-end valida permissões a cada requisição, impedindo que um usuário acesse dados de outro.</li>
+                    <li><strong>Privacidade de dados financeiros</strong>: Informações sensíveis (valores, categorias pessoais, documentos) são tratadas com políticas de retenção e criptografia em repouso, alinhadas às expectativas de um aplicativo de gestão financeira.</li>
+                    <li><strong>Open Banking</strong>: Integrações bancárias seguem fluxo de consentimento explícito do usuário, com credenciais nunca armazenadas em texto plano e uso limitado aos escopos autorizados.</li>
+                </ul>
+            </section>
+
+            <!-- DESIGN SYSTEM -->
+            <section id="design-system" class="docs-section">
+                <h2>Design System & Interface Humana (UI/UX)</h2>
+
+                <h3>Conceitos Estéticos</h3>
+                <p>A interface adota um design system coeso baseado em:</p>
+                <ul>
+                    <li><strong>Dark mode nativo</strong>: Paleta escura como estado padrão, reduzindo fadiga visual e alinhando-se a aplicativos financeiros modernos.</li>
+                    <li><strong>Glassmorphism</strong>: Efeitos de vidro fosco translúcido em cartões, modais e barras de navegação, criando profundidade sem poluir a leitura.</li>
+                    <li><strong>Responsividade fluida</strong>: Layouts adaptativos que transitam naturalmente entre desktop e mobile, utilizando unidades relativas, grids flexíveis e breakpoints calibrados para telas de 360px a larguras estendidas.</li>
+                </ul>
+
+                <h3>Elementos Interativos</h3>
+                <ul>
+                    <li><strong>Cards com efeito 3D (Tilt)</strong>: Cartões de funcionalidades respondem ao movimento do ponteiro com transformações tridimensionais suaves, mantendo desempenho via aceleração de hardware.</li>
+                    <li><strong>Gráficos dinâmicos</strong>: Componentes visuais adaptativos ajustam proporção, densidade de dados e legendas conforme a tela, preservando legibilidade tanto no celular quanto no desktop.</li>
+                    <li><strong>Modais customizados</strong>: Sistema de diálogos próprio com animações de entrada/saída, suporte a temas claro e escuro, e comportamentos distintos para alertas, confirmações e formulários.</li>
+                </ul>
+
+                <h3>Diretrizes de Acessibilidade e Experiência Mobile</h3>
+                <ul>
+                    <li><strong>Navegação contínua</strong>: Scroll vertical livre, sem bloqueios acidentais ou zonas mortas na viewport.</li>
+                    <li><strong>Prevenção de zoom indesejado</strong>: Configurações de viewport bloqueiam pinch-to-zoom acidental, preservando a sensação de app nativo sem comprometer a legibilidade.</li>
+                    <li><strong>Alvos de toque adequados</strong>: Botões e elementos interativos possuem áreas mínimas de toque calibradas para dedos.</li>
+                    <li><strong>Feedback visual</strong>: Estados de hover, active e focus são tratados com transições visuais claras; o sistema evita seleção acidental de texto em botões e cartões para não quebrar a imersão.</li>
+                    <li><strong>Suporte a telas notch</strong>: O layout respeita áreas seguras de dispositivos com recortes, utilizando insets e viewport-fit para garantir que conteúdo crítico não seja ocultado.</li>
+                </ul>
+            </section>
+
+            <!-- COMPONENTES -->
+            <section id="componentes" class="docs-section">
+                <h2>Componentes da Aplicação</h2>
+
+                <h3>Dashboard e Métricas</h3>
+                <p>O painel principal organiza-se em seções hierárquicas:</p>
+                <ul>
+                    <li><strong>Cabeçalho</strong>: Acesso rápido a ações principais, saudação do usuário e sincronização bancária.</li>
+                    <li><strong>Cards de métricas</strong>: Indicadores de saldo, rendimento previsto e volume de lançamentos, com tendências visuais.</li>
+                    <li><strong>Área de gráficos</strong>: Histórico patrimonial e distribuição por categorias, adaptativos ao tamanho da tela.</li>
+                    <li><strong>Tabela de movimentações</strong>: Listagem paginada de lançamentos com ações individuais e scroll otimizado para touch.</li>
+                    <li><strong>Seção de objetivos</strong>: Barra de progresso visual com marcadores animados, permitindo acompanhamento visual de metas de investimento.</li>
+                </ul>
+
+                <h3>Gestão de Dados Financeiros</h3>
+                <ul>
+                    <li><strong>Lançamentos manuais</strong>: Registro de entradas, saídas e investimentos com data, valor, categoria e descrição.</li>
+                    <li><strong>Categorização inteligente</strong>: Classificação automática de transações por nome do estabelecimento, com aprendizado baseado no histórico.</li>
+                    <li><strong>Open Banking</strong>: Integração com instituições financeiras via widget seguro, permitindo sincronização automática de transações.</li>
+                    <li><strong>Comprovantes</strong>: Upload e armazenamento de documentos financeiros, vinculados a lançamentos específicos.</li>
+                </ul>
+
+                <h3>Sistema de Temas</h3>
+                <p>A aplicação oferece alternância entre tema escuro nativo e tema claro, com transições suaves em todos os elementos. O tema selecionado é persistido localmente e aplicado consistentemente em todos os componentes, incluindo gráficos, modais e elementos de vidro fosco.</p>
+            </section>
+
+            <!-- FLUXOS PRINCIPAIS -->
+            <section id="fluxos" class="docs-section">
+                <h2>Fluxos Principais</h2>
+
+                <h3>Autenticação e Onboarding</h3>
+                <ol>
+                    <li>Usuário acessa a página inicial e pode criar conta ou fazer login.</li>
+                    <li>Após autenticação, é redirecionado para o dashboard principal.</li>
+                    <li>Sessão é mantida de forma segura, com validação de acesso a cada visita.</li>
+                </ol>
+
+                <h3>Registro e Categorização</h3>
+                <ol>
+                    <li>Usuário adiciona lançamento manualmente ou via sincronização bancária.</li>
+                    <li>Sistema aplica categorização automática quando disponível.</li>
+                    <li>Dados são sincronizados em tempo real com a nuvem.</li>
+                </ol>
+
+                <h3>Análise e Inteligência Artificial</h3>
+                <ol>
+                    <li>Usuário consulta o assistente financeiro sobre qualquer dado ou funcionalidade.</li>
+                    <li>Assistente responde exclusivamente dentro do domínio de finanças pessoais.</li>
+                    <li>Sugestões e alertas são gerados com base no comportamento financeiro detectado.</li>
+                </ol>
+
+                <h3>Instalação e Offline</h3>
+                <ol>
+                    <li>Usuário instala o aplicativo na tela inicial via prompt nativo ou guia específico para dispositivos móveis.</li>
+                    <li>Service Worker cacheia a aplicação para funcionamento offline completo.</li>
+                    <li>Em caso de perda de conexão, interface continua operacional com dados locais.</li>
+                    <li>Ao reconectar, alterações são sincronizadas automaticamente.</li>
+                </ol>
+            </section>
+
+            <footer style="margin-top: 80px; padding-top: 30px; border-top: 1px solid rgba(255,255,255,0.08); color: #484f58; font-size: 0.85rem;">
+                <p>Melon Wallet — Documentação Oficial. Todos os direitos reservados.</p>
+            </footer>
+        </main>
+    </div>
+
+    <script>
+        // Smooth scroll para links da sidebar
+        document.querySelectorAll('.docs-nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                    document.querySelectorAll('.docs-nav-link').forEach(l => l.classList.remove('active'));
+                    this.classList.add('active');
+                }
+            });
+        });
+
+        // Highlight ativo ao scroll
+        const sections = document.querySelectorAll('.docs-section');
+        const navLinks = document.querySelectorAll('.docs-nav-link');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (scrollY >= sectionTop - 100) {
+                    current = section.getAttribute('id');
+                }
+            });
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + current) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

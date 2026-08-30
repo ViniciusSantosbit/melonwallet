@@ -2,7 +2,7 @@ import express from 'express';
 import 'dotenv/config';
 import webpush from 'web-push';
 import cors from 'cors';
-import { readFileSync, readdirSync, existsSync } from 'fs';
+import { existsSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import {
@@ -28,7 +28,8 @@ const VAPID_SUBJECT = process.env.VAPID_SUBJECT || 'mailto:contato@melonwallet.a
 app.use(cors({ origin: FRONTEND_URL }));
 app.use(express.json());
 
-const publicDir = __dirname;
+const publicDir = join(__dirname, 'public');
+const indexPath = join(publicDir, 'index.html');
 
 app.use(express.static(publicDir, {
     extensions: ['html'],
@@ -46,29 +47,19 @@ app.use(express.static(publicDir, {
         } else if (filePath.endsWith('.json')) {
             res.setHeader('Content-Type', 'application/json; charset=utf-8');
         }
-        res.setHeader('Cache-Control', 'no-cache');
     }
 }));
 
 app.get('/', (req, res) => {
-    const indexPath = join(publicDir, 'index.html');
-    console.log('[DEBUG] Serving index.html from:', indexPath);
     res.sendFile(indexPath);
 });
 
 app.get('/debug', (req, res) => {
-    let files = [];
-    try {
-        files = readdirSync(publicDir);
-    } catch (e) {
-        files = ['Error: ' + e.message];
-    }
     res.json({
-        dirname: __dirname,
         publicDir,
-        files,
-        styleCssExists: files.includes('style.css'),
-        logoPngExists: files.includes('logo.png'),
+        indexExists: existsSync(indexPath),
+        styleExists: existsSync(join(publicDir, 'style.css')),
+        logoExists: existsSync(join(publicDir, 'logo.png')),
     });
 });
 
@@ -227,10 +218,9 @@ app.get('*', (req, res) => {
         if (mimeTypes[ext]) {
             res.setHeader('Content-Type', mimeTypes[ext]);
         }
-        res.setHeader('Cache-Control', 'no-cache');
         res.sendFile(filePath);
     } else {
-        res.sendFile(join(publicDir, 'index.html'));
+        res.sendFile(indexPath);
     }
 });
 

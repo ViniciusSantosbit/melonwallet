@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Melon Wallet | Gráfico Geral</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="stylesheet" href="style.css">
+
+    <!-- ═══ PWA ═══ -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Melon Wallet">
+    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="apple-touch-icon" href="/icons/icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192x192.png">
+    <!-- ═══════════ -->
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+</head>
+<body class="dashboard-body">
+
+    <div id="loader-wrapper">
+        <div class="loader-content">
+            <div class="orbit-container">
+                <span class="loader-melon">🍈</span>
+                <span class="loader-ant">🐜</span>
+                <span class="loader-ant second">🐜</span>
+            </div>
+            <p>Preparando seu patrimônio...</p>
+        </div>
+    </div>
+
+    <nav class="navbar">
+        <div class="nav-content">
+            <div class="nav-logo">
+                <img src="logo.png" alt="Melon Logo">
+                <span class="nav-brand-text">melon</span>
+            </div>
+            <div class="nav-user-info">
+                <span id="user-greeting">Olá...</span>
+                <button id="btn-sync-bank" class="btn-sync-bank">Sincronizar</button>
+                <div id="bank-status-wrapper" class="bank-status-wrapper hidden">
+                    <span id="bank-status" class="bank-status">🏦 Conta Conectada</span>
+                    <div class="bank-dropdown">
+                        <button id="btn-change-bank" class="bank-dropdown-item">Trocar de Banco</button>
+                    </div>
+                </div>
+                <button id="btn-theme-toggle" class="btn-theme-toggle" aria-label="Alternar tema" title="Alternar tema (Melon Mode)">
+                    <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <circle cx="12" cy="12" r="4"></circle>
+                        <line x1="12" y1="2" x2="12" y2="4"></line>
+                        <line x1="12" y1="20" x2="12" y2="22"></line>
+                        <line x1="4.93" y1="4.93" x2="6.34" y2="6.34"></line>
+                        <line x1="17.66" y1="17.66" x2="19.07" y2="19.07"></line>
+                        <line x1="2" y1="12" x2="4" y2="12"></line>
+                        <line x1="20" y1="12" x2="22" y2="12"></line>
+                        <line x1="4.93" y1="19.07" x2="6.34" y2="17.66"></line>
+                        <line x1="17.66" y1="6.34" x2="19.07" y2="4.93"></line>
+                    </svg>
+                    <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                </button>
+                <button class="nav-btn-logout" onclick="logout()">Sair</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="dashboard-container">
+        <header class="dash-header">
+            <div>
+                <span id="current-date" style="color: #86868b; font-size: 0.85rem; text-transform: capitalize; font-weight: 500;"></span>
+                <h1>Visão Geral:</h1>
+                <p>Gerencie seu patrimônio com a inteligência do Melão.</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn-add-simulacao" onclick="abrirModal()">+ Nova Simulação</button>
+                <button class="btn-scan-receipt" onclick="abrirSeletorOCR()">
+                    <span class="scan-icon">📷</span> Escanear Comprovante
+                </button>
+            </div>
+            <input type="file" id="ocr-file-input" accept="image/*,application/pdf" capture="environment" style="display: none;">
+        </header>
+
+        <div class="metrics-grid">
+            <div class="metric-card gold-border">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <span>Saldo:</span>
+                    <select id="seletor-tipo-saldo" onchange="alternarVisualizacaoSaldo()" class="saldo-selector">
+                        <option value="total">Total Acumulado</option>
+                        <option value="mes" selected>Apenas este Mês</option>
+                    </select>
+                </div>
+                <h2 id="total-saldo">R$ 0,00</h2>
+                <div id="tendencia-container" class="mini-trend">...</div>
+            </div>
+            <div class="metric-card">
+                <span>Rendimento Previsto:</span>
+                <h2 id="total-lucro">R$ 0,00</h2>
+                <div class="mini-trend">Lucro de 1% a.m.</div>
+            </div>
+            <div class="metric-card">
+                <span>Lançamentos:</span>
+                <h2 id="total-ativos">0</h2>
+                <div class="mini-trend">Total de registros</div>
+            </div>
+        </div>
+
+        <div class="main-dash-content">
+            <div class="chart-section glass-card-dash">
+                <!-- Header do card: empilha em mobile -->
+                <div class="chart-card-header">
+                    <h3>Histórico e Categorias</h3>
+                    <div class="mes-selector-box">
+                        <label>Gráfico do mês:</label>
+                        <select id="filtro-mes-pizza"></select>
+                    </div>
+                </div>
+                <!-- CORREÇÃO PRINCIPAL: inline style removido, classe no lugar -->
+                <div class="charts-container-split">
+                    <div class="chart-container-scroll">
+                        <div class="chart-box"><canvas id="patrimonioChart"></canvas></div>
+                    </div>
+                    <div class="chart-box"><canvas id="pizzaChart"></canvas></div>
+                </div>
+            </div>
+            
+            <div class="list-section glass-card-dash">
+                <h3>Últimas Movimentações</h3>
+                <div class="table-scroll">
+                    <table id="simulacoes-table">
+                        <thead>
+                            <tr><th>DESCRIÇÃO</th><th>TIPO</th><th>VALOR</th><th>AÇÕES</th></tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <section class="goal-section">
+            <div class="goal-header-row">
+                <div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <h3 style="margin: 0;">Objetivo de Investimento</h3>
+                        <button onclick="editarMeta()" class="btn-edit-goal">alterar meta ⚙️</button>
+                    </div>
+                    <p style="color: #86868b; font-size: 0.9rem;">As formigas estão trabalhando para você!</p>
+                </div>
+                <div class="goal-percent-box">
+                    <span id="goal-percent-text">0%</span>
+                    <p id="goal-value-text">R$ 0 / R$ 10.000</p>
+                </div>
+            </div>
+
+            <div class="ant-track">
+                <div id="goal-progress-bar" class="ant-progress">
+                    <span class="ant-walker">🐜</span>
+                </div>
+                <span class="melon-target">🍈</span>
+            </div>
+
+            <div style="margin-top: 50px;">
+                <h3 style="margin-bottom: 20px;">Curiosidades: Maiores Gastos do Mês</h3>
+                <div id="top-expenses-container" class="top-expenses-grid"></div>
+            </div>
+        </section>
+    </main>
+
+    <div id="modal-simulacao" class="modal-overlay" style="display: none;">
+        <div class="glass-card modal-card">
+            <header class="modal-header">
+                <h2>Novo Lançamento</h2>
+                <button class="close-btn" onclick="fecharModal()">×</button>
+            </header>
+            <form id="formSimulacao">
+                <input type="text" id="sim-nome" list="sugestoes-nomes" placeholder="Ex: Aluguel, Salário..." required>
+                <datalist id="sugestoes-nomes">
+                    <option value="Salário"><option value="Mercado"><option value="Lazer"><option value="Aluguel"><option value="Investimento">
+                </datalist>
+                <select id="sim-tipo" required>
+                    <option value="Entrada">Entrada (Ganho)</option>
+                    <option value="Saída">Saída (Gasto)</option>
+                    <option value="Investimento">Investimento</option>
+                </select>
+                <input type="datetime-local" id="dataSimulacao" required>
+                <input type="number" step="0.01" id="sim-valor" placeholder="Valor (R$)" required>
+                <button type="submit" class="btn-main">Salvar Registro</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="dashboard.js"></script>
+    <script src="https://cdn.pluggy.ai/pluggy-connect/v2.8.2/pluggy-connect.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="module" src="controllers/dashboard.controller.js"></script>
+</body>
+</html>
