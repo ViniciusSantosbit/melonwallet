@@ -22,7 +22,7 @@ function getVapidKeys() {
 }
 
 const vapidKeys = getVapidKeys();
-webpush.setVAPIDDetails(
+webpush.setVapidDetails(
     VAPID_SUBJECT,
     vapidKeys.publicKey,
     vapidKeys.privateKey
