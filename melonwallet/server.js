@@ -26,6 +26,7 @@ const VAPID_SUBJECT = process.env.VAPID_SUBJECT || 'mailto:contato@melonwallet.a
 
 app.use(cors({ origin: FRONTEND_URL }));
 app.use(express.json());
+app.use(express.static(__dirname, { extensions: ['html'] }));
 
 function getVapidKeys() {
     if (VAPID_PUBLIC_KEY && VAPID_PRIVATE_KEY) {
@@ -45,7 +46,7 @@ webpush.setVapidDetails(
 );
 console.log('[VAPID] Chaves configuradas:', vapidKeys.publicKey.slice(0, 20) + '...');
 
-app.get('/', (req, res) => {
+app.get('/api', (req, res) => {
     res.json({ 
         status: 'ok', 
         message: 'Melon Wallet API está rodando',
