@@ -1,5 +1,5 @@
 // bar-chart.js
-import { buildBarChartData } from '../utils/finance.util.js';
+import { buildBarChartData } from '/utils/finance.util.js';
 
 let barChartInstance = null;
 

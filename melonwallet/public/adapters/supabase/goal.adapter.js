@@ -1,4 +1,4 @@
-import { DEFAULT_META_INVESTIMENTO, STORAGE_KEYS } from '/config/constants.js';
+import { DEFAULT_META_INVESTIMENTO, STORAGE_KEYS } from '../../config/constants.js';
 
 export function getMetaInvestimento() {
     const salva = localStorage.getItem(STORAGE_KEYS.META_INVESTIMENTO);

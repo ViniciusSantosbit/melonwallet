@@ -1,4 +1,4 @@
-import { formatBRL } from '../utils/format.util.js';
+import { formatBRL } from '/utils/format.util.js';
 
 export function updateMetrics({
     saldoGlobal,

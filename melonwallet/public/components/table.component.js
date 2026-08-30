@@ -1,5 +1,5 @@
 // table.component.js
-import { SIMULACAO_TIPOS } from '../config/constants.js';
+import { SIMULACAO_TIPOS } from '/config/constants.js';
 
 export function renderSimulacoesTable(simulacoes, onDelete) {
     const tbody = document.querySelector('#simulacoes-table tbody');

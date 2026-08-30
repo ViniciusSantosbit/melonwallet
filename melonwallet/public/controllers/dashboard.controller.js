@@ -1,10 +1,10 @@
-import '../config/supabase.js';
-import { registerChartPlugins } from '../charts/chart-registry.js';
-import { renderBarChart } from '../charts/bar-chart.js';
-import { renderPieChart } from '../charts/pie-chart.js';
-import { hideLoader } from '../components/loader.component.js';
-import { abrirModal, fecharModal } from '../components/modal.component.js';
-import { showMelonConfirm, showMelonAlert } from '../utils/modal.util.js';
+import '/config/supabase.js';
+import { registerChartPlugins } from '/charts/chart-registry.js';
+import { renderBarChart } from '/charts/bar-chart.js';
+import { renderPieChart } from '/charts/pie-chart.js';
+import { hideLoader } from '/components/loader.component.js';
+import { abrirModal, fecharModal } from '/components/modal.component.js';
+import { showMelonConfirm, showMelonAlert } from '/utils/modal.util.js';
 import {
     alternarVisualizacaoSaldo,
     populateMonthSelector,
@@ -12,17 +12,17 @@ import {
     setDefaultMonthInput,
     setGreeting,
     updateMetrics,
-} from '../components/metrics.component.js';
-import { renderGoalProgress, renderTopExpenses } from '../components/goals.component.js';
-import { renderSimulacoesTable } from '../components/table.component.js';
-import { criarSimulacao, deletarSimulacao, listarSimulacoes } from '../services/simulacoes.service.js';
-import { escanearComprovante } from '../services/ocr.service.js';
-import { categorizarGasto } from '../services/ai.service.js';
-import { initPluggySyncButton, sincronizarBanco } from '../adapters/open-finance/pluggy.adapter.js';
-import { initChatWidget } from '../components/chat.component.js';
-import { getUserId, getUserName } from '../storage/session.storage.js';
-import { getMetaInvestimento, setMetaInvestimento } from '../storage/meta.storage.js';
-import { logout, requireAuth } from '../services/session.service.js';
+} from '/components/metrics.component.js';
+import { renderGoalProgress, renderTopExpenses } from '/components/goals.component.js';
+import { renderSimulacoesTable } from '/components/table.component.js';
+import { criarSimulacao, deletarSimulacao, listarSimulacoes } from '/services/simulacoes.service.js';
+import { escanearComprovante } from '/services/ocr.service.js';
+import { categorizarGasto } from '/services/ai.service.js';
+import { initPluggySyncButton, sincronizarBanco } from '/adapters/open-finance/pluggy.adapter.js';
+import { initChatWidget } from '/components/chat.component.js';
+import { getUserId, getUserName } from '/storage/session.storage.js';
+import { getMetaInvestimento, setMetaInvestimento } from '/storage/meta.storage.js';
+import { logout, requireAuth } from '/services/session.service.js';
 import {
     aggregateExpensesByName,
     aggregatePieChartData,
@@ -30,9 +30,9 @@ import {
     computeGoalProgress,
     computeTotalInvestments,
     getTopExpenses,
-} from '../utils/finance.util.js';
-import { getCurrentMonthInput, getLongDateString, getMonthLabel } from '../utils/dates.util.js';
-import { registerServiceWorker } from '../pwa/register-sw.js';
+} from '/utils/finance.util.js';
+import { getCurrentMonthInput, getLongDateString, getMonthLabel } from '/utils/dates.util.js';
+import { registerServiceWorker } from '/pwa/register-sw.js';
 
 registerChartPlugins();
 

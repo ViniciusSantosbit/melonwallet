@@ -1,5 +1,5 @@
 import { getMonthLabel, getPreviousMonthLabel } from './dates.util.js';
-import { SIMULACAO_TIPOS } from '../config/constants.js';
+import { SIMULACAO_TIPOS } from '/config/constants.js';
 
 function cleanNome(nome) {
     if (!nome) return '';

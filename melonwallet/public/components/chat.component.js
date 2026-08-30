@@ -1,4 +1,4 @@
-import { consultarAssistente } from '../services/ai.service.js';
+import { consultarAssistente } from '/services/ai.service.js';
 
 const CHAT_ID = 'ai-chat-widget';
 let isOpen = false;

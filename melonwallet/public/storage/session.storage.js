@@ -1,4 +1,4 @@
-import { STORAGE_KEYS } from '../config/constants.js';
+import { STORAGE_KEYS } from '/config/constants.js';
 
 export function getUserId() {
     return localStorage.getItem(STORAGE_KEYS.USER_ID);

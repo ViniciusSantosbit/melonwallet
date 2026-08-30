@@ -1,9 +1,9 @@
-import '../config/supabase.js';
-import { login, register } from '../services/auth.service.js';
-import { persistSession, redirectIfAuthenticated } from '../services/session.service.js';
-import { initInstallBanner } from '../pwa/install-banner.js';
-import { registerServiceWorker } from '../pwa/register-sw.js';
-import { showMelonAlert } from '../utils/modal.util.js';
+import '/config/supabase.js';
+import { login, register } from '/services/auth.service.js';
+import { persistSession, redirectIfAuthenticated } from '/services/session.service.js';
+import { initInstallBanner } from '/pwa/install-banner.js';
+import { registerServiceWorker } from '/pwa/register-sw.js';
+import { showMelonAlert } from '/utils/modal.util.js';
 
 redirectIfAuthenticated();
 
