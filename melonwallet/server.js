@@ -45,6 +45,20 @@ webpush.setVapidDetails(
 );
 console.log('[VAPID] Chaves configuradas:', vapidKeys.publicKey.slice(0, 20) + '...');
 
+app.get('/', (req, res) => {
+    res.json({ 
+        status: 'ok', 
+        message: 'Melon Wallet API está rodando',
+        endpoints: [
+            '/api/notifications/vapid-public-key',
+            '/api/notifications/subscribe',
+            '/api/notifications/unsubscribe',
+            '/api/notifications/test',
+            '/api/notifications/process'
+        ]
+    });
+});
+
 app.get('/api/notifications/vapid-public-key', (req, res) => {
     res.json({ publicKey: vapidKeys.publicKey });
 });
