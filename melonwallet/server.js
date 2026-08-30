@@ -29,15 +29,26 @@ app.use(cors({ origin: FRONTEND_URL }));
 app.use(express.json());
 
 const publicDir = __dirname;
-console.log('[DEBUG] __dirname:', __dirname);
-console.log('[DEBUG] publicDir:', publicDir);
-try {
-    console.log('[DEBUG] Files in publicDir:', readdirSync(publicDir).slice(0, 20));
-} catch (e) {
-    console.log('[DEBUG] Error reading dir:', e.message);
-}
 
-app.use(express.static(publicDir, { extensions: ['html'] }));
+app.use(express.static(publicDir, {
+    extensions: ['html'],
+    setHeaders: (res, filePath) => {
+        if (filePath.endsWith('.css')) {
+            res.setHeader('Content-Type', 'text/css; charset=utf-8');
+        } else if (filePath.endsWith('.js')) {
+            res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
+        } else if (filePath.endsWith('.png')) {
+            res.setHeader('Content-Type', 'image/png');
+        } else if (filePath.endsWith('.jpg') || filePath.endsWith('.jpeg')) {
+            res.setHeader('Content-Type', 'image/jpeg');
+        } else if (filePath.endsWith('.svg')) {
+            res.setHeader('Content-Type', 'image/svg+xml');
+        } else if (filePath.endsWith('.json')) {
+            res.setHeader('Content-Type', 'application/json; charset=utf-8');
+        }
+        res.setHeader('Cache-Control', 'no-cache');
+    }
+}));
 
 app.get('/', (req, res) => {
     const indexPath = join(publicDir, 'index.html');
@@ -202,6 +213,21 @@ if (!process.env.VERCEL) {
 app.get('*', (req, res) => {
     const filePath = join(publicDir, req.path);
     if (existsSync(filePath) && !req.path.endsWith('.html')) {
+        const ext = req.path.split('.').pop()?.toLowerCase();
+        const mimeTypes = {
+            css: 'text/css; charset=utf-8',
+            js: 'application/javascript; charset=utf-8',
+            png: 'image/png',
+            jpg: 'image/jpeg',
+            jpeg: 'image/jpeg',
+            svg: 'image/svg+xml',
+            json: 'application/json; charset=utf-8',
+            ico: 'image/x-icon',
+        };
+        if (mimeTypes[ext]) {
+            res.setHeader('Content-Type', mimeTypes[ext]);
+        }
+        res.setHeader('Cache-Control', 'no-cache');
         res.sendFile(filePath);
     } else {
         res.sendFile(join(publicDir, 'index.html'));
