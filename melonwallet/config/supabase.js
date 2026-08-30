@@ -1,3 +1,5 @@
+import { createClient } from '@supabase/supabase-js';
+
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_ANON_KEY;
 
@@ -5,7 +7,7 @@ if (!SUPABASE_URL || !SUPABASE_KEY) {
     console.error('❌ Variáveis SUPABASE_URL e SUPABASE_ANON_KEY são obrigatórias no .env');
 }
 
-export const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+export const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 async function testarConexao() {
     try {
