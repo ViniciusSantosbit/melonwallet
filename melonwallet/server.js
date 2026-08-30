@@ -2,6 +2,7 @@ import express from 'express';
 import 'dotenv/config';
 import webpush from 'web-push';
 import cors from 'cors';
+import { readFileSync, readdirSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import {
@@ -27,11 +28,37 @@ const VAPID_SUBJECT = process.env.VAPID_SUBJECT || 'mailto:contato@melonwallet.a
 app.use(cors({ origin: FRONTEND_URL }));
 app.use(express.json());
 
-const publicDir = join(__dirname);
+const publicDir = __dirname;
+console.log('[DEBUG] __dirname:', __dirname);
+console.log('[DEBUG] publicDir:', publicDir);
+try {
+    console.log('[DEBUG] Files in publicDir:', readdirSync(publicDir).slice(0, 20));
+} catch (e) {
+    console.log('[DEBUG] Error reading dir:', e.message);
+}
+
 app.use(express.static(publicDir, { extensions: ['html'] }));
 
 app.get('/', (req, res) => {
-    res.sendFile(join(publicDir, 'index.html'));
+    const indexPath = join(publicDir, 'index.html');
+    console.log('[DEBUG] Serving index.html from:', indexPath);
+    res.sendFile(indexPath);
+});
+
+app.get('/debug', (req, res) => {
+    let files = [];
+    try {
+        files = readdirSync(publicDir);
+    } catch (e) {
+        files = ['Error: ' + e.message];
+    }
+    res.json({
+        dirname: __dirname,
+        publicDir,
+        files,
+        styleCssExists: files.includes('style.css'),
+        logoPngExists: files.includes('logo.png'),
+    });
 });
 
 function getVapidKeys() {
