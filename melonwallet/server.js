@@ -202,26 +202,18 @@ if (!process.env.VERCEL) {
 }
 
 app.get('*', (req, res) => {
-    const filePath = join(publicDir, req.path);
-    if (existsSync(filePath) && !req.path.endsWith('.html')) {
-        const ext = req.path.split('.').pop()?.toLowerCase();
-        const mimeTypes = {
-            css: 'text/css; charset=utf-8',
-            js: 'application/javascript; charset=utf-8',
-            png: 'image/png',
-            jpg: 'image/jpeg',
-            jpeg: 'image/jpeg',
-            svg: 'image/svg+xml',
-            json: 'application/json; charset=utf-8',
-            ico: 'image/x-icon',
-        };
-        if (mimeTypes[ext]) {
-            res.setHeader('Content-Type', mimeTypes[ext]);
+    const ext = req.path.split('.').pop()?.toLowerCase();
+    const isStaticFile = ['css', 'js', 'png', 'jpg', 'jpeg', 'gif', 'svg', 'ico', 'json', 'woff', 'woff2', 'ttf', 'eot', 'map'].includes(ext);
+
+    if (isStaticFile) {
+        const filePath = join(publicDir, req.path);
+        if (existsSync(filePath)) {
+            return res.sendFile(filePath);
         }
-        res.sendFile(filePath);
-    } else {
-        res.sendFile(indexPath);
+        return res.status(404).send('Not found');
     }
+
+    res.sendFile(indexPath);
 });
 
 export default app;
