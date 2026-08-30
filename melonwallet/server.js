@@ -144,9 +144,12 @@ app.post('/api/notifications/process', async (req, res) => {
     }
 });
 
-app.listen(PORT, () => {
-    console.log(`[Server] Melon Wallet Push Server rodando na porta ${PORT}`);
-    console.log(`[Server] VAPID Public Key: ${vapidKeys.publicKey}`);
-});
+if (!process.env.VERCEL) {
+    app.listen(PORT, () => {
+        console.log(`[Server] Melon Wallet Push Server rodando na porta ${PORT}`);
+        console.log(`[Server] VAPID Public Key: ${vapidKeys.publicKey}`);
+    });
+}
 
+export default app;
 export { vapidKeys };
