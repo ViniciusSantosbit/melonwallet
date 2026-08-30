@@ -25,6 +25,10 @@ function mostrarCadastro() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
+window.mostrarLogin = mostrarLogin;
+window.mostrarCadastro = mostrarCadastro;
+window.toggleAuth = toggleAuth;
+
 function initScrollReveal() {
     const observer = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {

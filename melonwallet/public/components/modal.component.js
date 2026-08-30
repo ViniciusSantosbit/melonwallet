@@ -12,3 +12,6 @@ export function abrirModal() {
 export function fecharModal() {
     document.getElementById('modal-simulacao').style.display = 'none';
 }
+
+window.abrirModal = abrirModal;
+window.fecharModal = fecharModal;
