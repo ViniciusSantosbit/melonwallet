@@ -113,6 +113,14 @@ function normalizarTransacaoPluggy(transacao, userId, contaId) {
     };
 }
 
+function chunkArray(array, size) {
+    const chunks = [];
+    for (let i = 0; i < array.length; i += size) {
+        chunks.push(array.slice(i, i + size));
+    }
+    return chunks;
+}
+
 export async function importarTransacoesPluggy(transacoesPluggy) {
     const userId = getUserId();
     if (!userId) {
@@ -122,20 +130,34 @@ export async function importarTransacoesPluggy(transacoesPluggy) {
     const contaId = await obterContaIdPadrao(userId);
     const normalizadas = transacoesPluggy.map((t) => normalizarTransacaoPluggy(t, userId, contaId));
 
-    console.log('Dados normalizados para o Supabase (bulk insert):', JSON.stringify(normalizadas, null, 2));
     console.log('Total de transações a inserir:', normalizadas.length);
-    console.log('Mês atual do sistema (getCurrentMonthInput):', getCurrentMonthInput());
 
-    console.log("Preparando para inserir", normalizadas.length, "transações no Supabase...");
+    const BATCH_SIZE = 100;
+    const lotes = chunkArray(normalizadas, BATCH_SIZE);
+    console.log(`Divididos em ${lotes.length} lotes de até ${BATCH_SIZE} transações`);
 
-    try {
-        const resultado = await adapterCriarMultiplos(normalizadas);
-        console.log('Transações inseridas no banco com sucesso!');
-        console.log('Resultado do INSERT no Supabase:', resultado);
+    let totalInseridos = 0;
 
-        return resultado;
-    } catch (error) {
-        console.error("Erro fatal ao salvar no Supabase:", error);
-        throw error;
+    for (let i = 0; i < lotes.length; i++) {
+        const lote = lotes[i];
+        console.log(`Inserindo lote ${i + 1}/${lotes.length} (${lote.length} transações)...`);
+
+        try {
+            const resultado = await adapterCriarMultiplos(lote);
+
+            if (resultado.error) {
+                console.error(`[Erro no lote ${i + 1}] Supabase retornou erro:`, resultado.error);
+                throw new Error(`Erro no lote ${i + 1}: ${resultado.error.message}`);
+            }
+
+            totalInseridos += lote.length;
+            console.log(`Lote ${i + 1}/${lotes.length} inserido com sucesso (${lote.length} transações)`);
+        } catch (error) {
+            console.error(`[Erro fatal no lote ${i + 1}]`, error.message);
+            throw error;
+        }
     }
+
+    console.log(`Transações inseridas no banco com sucesso! Total: ${totalInseridos}/${normalizadas.length}`);
+    return { totalInseridos, totalEsperado: normalizadas.length };
 }
