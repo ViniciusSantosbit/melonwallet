@@ -1,5 +1,26 @@
 import { importarTransacoesPluggy } from '../../services/simulacoes.service.js';
 import { showMelonAlert } from '../../utils/modal.util.js';
+import { supabaseClient } from '/config/supabase.js';
+import { getUserId } from '/storage/session.storage.js';
+
+export async function verificarConexaoPluggy() {
+    const userId = getUserId();
+    if (!userId) return false;
+
+    const { data, error } = await supabaseClient
+        .from('simulacoes')
+        .select('id')
+        .eq('user_id', userId)
+        .eq('origem', 'open_finance')
+        .limit(1);
+
+    if (error) {
+        console.error('[Pluggy] Erro ao verificar conexão:', error);
+        return false;
+    }
+
+    return data && data.length > 0;
+}
 
 export async function gerarConnectToken() {
     const response = await fetch('/api/pluggy-token', {
@@ -96,7 +117,20 @@ export async function sincronizarBanco(onSyncComplete) {
 
 export function initPluggySyncButton(onSyncComplete) {
     const btn = document.getElementById('btn-sync-bank');
+    const statusWrapper = document.getElementById('bank-status-wrapper');
+    const statusText = document.getElementById('bank-status');
     if (!btn) return;
+
+    verificarConexaoPluggy().then(conectado => {
+        if (conectado && statusWrapper && statusText) {
+            btn.classList.add('hidden');
+            statusWrapper.classList.remove('hidden');
+            statusText.textContent = '🏦 Conta Conectada';
+        } else {
+            btn.classList.remove('hidden');
+            if (statusWrapper) statusWrapper.classList.add('hidden');
+        }
+    });
 
     btn.addEventListener('click', async () => {
         console.log('Botão Sincronizar clicado!');
@@ -106,6 +140,12 @@ export function initPluggySyncButton(onSyncComplete) {
             btn.disabled = true;
             btn.textContent = 'Sincronizando...';
             await sincronizarBanco(onSyncComplete);
+
+            if (statusWrapper && statusText) {
+                btn.classList.add('hidden');
+                statusWrapper.classList.remove('hidden');
+                statusText.textContent = '🏦 Conta Conectada';
+            }
         } catch (error) {
             console.error('Erro na sincronização Open Finance:', error);
             await showMelonAlert('Não foi possível completar a sincronização: ' + error.message, { type: 'error' });
