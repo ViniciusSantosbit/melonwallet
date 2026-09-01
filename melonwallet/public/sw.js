@@ -35,6 +35,22 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+    const url = new URL(event.request.url);
+
+    if (event.request.method !== 'GET') {
+        event.respondWith(fetch(event.request));
+        return;
+    }
+
+    if (url.pathname.startsWith('/api/') ||
+        url.hostname.includes('supabase') ||
+        url.hostname.includes('pluggy') ||
+        url.hostname.includes('cdn.jsdelivr') ||
+        url.hostname.includes('ocr.space')) {
+        event.respondWith(fetch(event.request));
+        return;
+    }
+
     event.respondWith(
         caches.match(event.request).then((cachedResponse) => {
             if (cachedResponse) {
