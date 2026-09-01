@@ -44,7 +44,16 @@ export async function criarSimulacao(simulacao) {
         conta_id: contaId,
     };
 
-    return adapterCriar(transacaoComConta);
+    console.log('[Simulação] Salvando:', JSON.stringify(transacaoComConta, null, 2));
+
+    const resultado = await adapterCriar(transacaoComConta);
+
+    if (resultado.error) {
+        console.error('[Simulação] Erro do Supabase:', resultado.error);
+        throw new Error(resultado.error.message || 'Erro ao salvar simulação');
+    }
+
+    return resultado;
 }
 
 export async function deletarSimulacao(id) {

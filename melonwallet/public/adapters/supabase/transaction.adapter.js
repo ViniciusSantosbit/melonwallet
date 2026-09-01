@@ -1,4 +1,4 @@
-import { supabaseClient } from '../../config/supabase.js';
+import { supabaseClient } from '/config/supabase.js';
 
 export async function listar(userId) {
     return supabaseClient
